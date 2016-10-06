@@ -1,6 +1,6 @@
 ﻿namespace ProShare
 {
-    partial class LoginForm
+    partial class StartForm
     {
         /// <summary>
         /// Required designer variable.
@@ -32,7 +32,7 @@
             this.usernameTextBox = new System.Windows.Forms.TextBox();
             this.passwordTextBox = new System.Windows.Forms.TextBox();
             this.loginButton = new System.Windows.Forms.Button();
-            this.registetButton = new System.Windows.Forms.Button();
+            this.registerButton = new System.Windows.Forms.Button();
             this.orLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
             this.SuspendLayout();
@@ -73,16 +73,18 @@
             this.loginButton.TabIndex = 2;
             this.loginButton.Text = "Login";
             this.loginButton.UseVisualStyleBackColor = true;
+            this.loginButton.Click += new System.EventHandler(this.loginButton_Click);
             // 
-            // registetButton
+            // registerButton
             // 
-            this.registetButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.registetButton.Location = new System.Drawing.Point(124, 301);
-            this.registetButton.Name = "registetButton";
-            this.registetButton.Size = new System.Drawing.Size(89, 28);
-            this.registetButton.TabIndex = 3;
-            this.registetButton.Text = "Register";
-            this.registetButton.UseVisualStyleBackColor = true;
+            this.registerButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.registerButton.Location = new System.Drawing.Point(124, 301);
+            this.registerButton.Name = "registerButton";
+            this.registerButton.Size = new System.Drawing.Size(89, 28);
+            this.registerButton.TabIndex = 3;
+            this.registerButton.Text = "Register";
+            this.registerButton.UseVisualStyleBackColor = true;
+            this.registerButton.Click += new System.EventHandler(this.registetButton_Click);
             // 
             // orLabel
             // 
@@ -94,19 +96,19 @@
             this.orLabel.TabIndex = 4;
             this.orLabel.Text = "or";
             // 
-            // LoginForm
+            // StartForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Highlight;
             this.ClientSize = new System.Drawing.Size(242, 363);
             this.Controls.Add(this.orLabel);
-            this.Controls.Add(this.registetButton);
+            this.Controls.Add(this.registerButton);
             this.Controls.Add(this.loginButton);
             this.Controls.Add(this.passwordTextBox);
             this.Controls.Add(this.usernameTextBox);
             this.Controls.Add(this.logoPictureBox);
-            this.Name = "LoginForm";
+            this.Name = "StartForm";
             this.Text = "ProShare";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).EndInit();
@@ -121,7 +123,7 @@
         private System.Windows.Forms.TextBox usernameTextBox;
         private System.Windows.Forms.TextBox passwordTextBox;
         private System.Windows.Forms.Button loginButton;
-        private System.Windows.Forms.Button registetButton;
+        private System.Windows.Forms.Button registerButton;
         private System.Windows.Forms.Label orLabel;
     }
 }

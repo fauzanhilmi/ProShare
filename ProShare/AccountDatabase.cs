@@ -7,6 +7,7 @@ using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Management;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace ProShare
 {
@@ -101,6 +102,7 @@ namespace ProShare
                 {
                     returnCode = ex.Number;
                     Debug.WriteLine(ex.Number + " : " + ex.Message);
+                    throw;
                 }
                 //case username is too long?
                 //more error codes?
@@ -110,13 +112,13 @@ namespace ProShare
 
         /* Check whether an account is already exist or not
          * Will return 4 possible return codes
-         * >  1      : Account is exist
-         * > -1      : Account is exist, but given username & password don't match
-         * >  0      : Account is not exist
+         * >  1      : Account is exist, username & password match
+         * >  0      : Account is exist, but given username & password don't match
+         * > -1      : Account is not exist
          * >  else   : Unknown error. Return code = MySQL error code */
         public static int isExist (string username, string password)
         {
-            int returnCode = 0; //default : not found
+            int returnCode = -1; //default : not found
             try
             {
                 string query = "SELECT * FROM account WHERE mac_address = '" + macAddress + "'";
@@ -125,11 +127,11 @@ namespace ProShare
                 Debug.WriteLine(query);
                 while (reader.Read())
                 {
-                    returnCode = -1; //found matching mac address, but not sure about the username &  password
+                    returnCode = 0; //found matching mac address, but not sure about the username &  password
                     Debug.WriteLine(reader[0] + " " + reader[1] + " " + reader[2]);
                 }
 
-                if(returnCode == -1)
+                if(returnCode == 0)
                 {
                     if (reader[1].ToString() == username && reader[2].ToString() == password)
                     {
@@ -137,7 +139,7 @@ namespace ProShare
                     }
                     else
                     {
-                        returnCode = -1; //mismatch username or password
+                        returnCode = 0; //mismatch username or password
                     }
                 }
             }
@@ -151,7 +153,15 @@ namespace ProShare
 
         public static void CloseConnection()
         {
-            SqlConn.Close();
+            try
+            {
+                SqlConn.Close();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex) //is it properly handled?
+            {
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
         }
     }
 }
