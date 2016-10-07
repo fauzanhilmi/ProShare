@@ -23,6 +23,8 @@ namespace ProShare
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            this.MaximizeBox = false;
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = ColorTranslator.FromHtml("#00B0F0");
 
             Image logo = Image.FromFile("../../../images/logo.png");
