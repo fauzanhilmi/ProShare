@@ -36,27 +36,7 @@ namespace ProShare
 
             passwordTextBox.Text = emptyPasswordText;
             passwordTextBox.GotFocus += PasswordTextBox_GotFocus;
-            passwordTextBox.LostFocus += PasswordTextBox_LostFocus;
-
-            
-
-            //passwordMaskedTextBox.
-            /*try
-            {
-                AccountDatabase.Connect();
-                string uid = "tranquillo";
-                string pass = "barnetta";
-                Debug.WriteLine(AccountDatabase.Add(uid, pass));
-                //Debug.WriteLine(AccountDatabase.isExist(uid, pass));
-                AccountDatabase.CloseConnection();
-            }
-            catch (MySql.Data.MySqlClient.MySqlException ex)
-            {
-                if(ex.Number == 1042) //Connection Error 
-                {
-                    Debug.WriteLine("Connection Error (" + ex.Number + ") : " + ex.Message);
-                }
-            }*/            
+            passwordTextBox.LostFocus += PasswordTextBox_LostFocus;    
         }
 
         private void UsernameTextBox_GotFocus(object sender, EventArgs e)
