@@ -230,6 +230,7 @@
             this.genShareButton.TabIndex = 5;
             this.genShareButton.Text = "Send Share Requests";
             this.genShareButton.UseVisualStyleBackColor = true;
+            this.genShareButton.Click += new System.EventHandler(this.genShareButton_Click);
             // 
             // genPlayersGroupBox
             // 

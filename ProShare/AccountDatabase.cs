@@ -45,7 +45,7 @@ namespace ProShare
             macAddress = macAddress.Replace(":", "");
 
             //TEST
-            //macAddress = GetRandomMacAddress();
+            macAddress = GetRandomMacAddress();
             //macAddress = "A9D37DD1D8F0";
             //TEST
         }

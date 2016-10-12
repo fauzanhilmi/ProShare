@@ -30,6 +30,8 @@ namespace ProShare
             Image logo = Image.FromFile("../../../images/logo.png");
             logoPictureBox.Image = logo;
 
+            waitLabel.Visible = false;
+
             usernameTextBox.Text = emptyUsernameText;
             usernameTextBox.GotFocus += UsernameTextBox_GotFocus;
             usernameTextBox.LostFocus += UsernameTextBox_LostFocus;
@@ -91,9 +93,14 @@ namespace ProShare
                     try
                     {
                         int result = AccountDatabase.isExist(username, password);
-                        if(result == 1)
+                        if(result == 1) //success
                         {
-                            MessageBox.Show("SUCCESS");
+                            waitLabel.Visible = true;
+                            //Form transition
+                            this.Hide();
+                            MainForm mf = new MainForm(username);
+                            this.Owner = mf;
+                            mf.Show();
                         }
                         else if(result == 0)
                         {
@@ -122,7 +129,7 @@ namespace ProShare
         {
             if(String.IsNullOrWhiteSpace(usernameTextBox.Text) || usernameTextBox.Text == emptyUsernameText || String.IsNullOrWhiteSpace(passwordTextBox.Text) || passwordTextBox.Text == emptyPasswordText)
             {
-                MessageBox.Show("Username and Password field cannot be empty", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Username and Password field cannot be empty", "Register Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             //Handle proper username / password format?
             else
@@ -136,10 +143,20 @@ namespace ProShare
                     try
                     {
                         int result = AccountDatabase.Add(username, password);
-                        if(result ==  1)
+                        if(result ==  1) //success
                         {
-                            MessageBox.Show("SUCCESS");
-                            //proceed!
+                            waitLabel.Visible = true;
+
+                            //Create user queue
+                            MessageQueue.Connect();
+                            MessageQueue.CreateQueue(username);
+                            MessageQueue.Close();
+
+                            //Form transition
+                            this.Hide();
+                            MainForm mf = new MainForm(username);
+                            this.Owner = mf;
+                            mf.Show();
                         }
                         else if(result == 0)
                         {

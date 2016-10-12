@@ -14,6 +14,8 @@ namespace ProShare
 {
     public partial class MainForm : Form
     {
+        private string username;
+
         /*      GENERATE attributes         */
         private string genEmptyName = "Enter a name";
         private string genEmptyText = "Enter a text here...";
@@ -24,6 +26,12 @@ namespace ProShare
 
         public MainForm()
         {
+            InitializeComponent();
+        }
+
+        public MainForm(string name)
+        {
+            username = name;
             InitializeComponent();
         }
 
@@ -304,6 +312,11 @@ namespace ProShare
             {
                 genAddButton.Enabled = true;
             }
+        }
+
+        private void genShareButton_Click(object sender, EventArgs e)
+        {
+
         }
 
         /*      Other Methods       */

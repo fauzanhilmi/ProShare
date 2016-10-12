@@ -34,6 +34,7 @@
             this.loginButton = new System.Windows.Forms.Button();
             this.registerButton = new System.Windows.Forms.Button();
             this.orLabel = new System.Windows.Forms.Label();
+            this.waitLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -96,12 +97,23 @@
             this.orLabel.TabIndex = 4;
             this.orLabel.Text = "or";
             // 
+            // waitLabel
+            // 
+            this.waitLabel.AutoSize = true;
+            this.waitLabel.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.waitLabel.Location = new System.Drawing.Point(27, 336);
+            this.waitLabel.Name = "waitLabel";
+            this.waitLabel.Size = new System.Drawing.Size(91, 18);
+            this.waitLabel.TabIndex = 5;
+            this.waitLabel.Text = "Please wait...";
+            // 
             // StartForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Highlight;
             this.ClientSize = new System.Drawing.Size(242, 363);
+            this.Controls.Add(this.waitLabel);
             this.Controls.Add(this.orLabel);
             this.Controls.Add(this.registerButton);
             this.Controls.Add(this.loginButton);
@@ -125,6 +137,7 @@
         private System.Windows.Forms.Button loginButton;
         private System.Windows.Forms.Button registerButton;
         private System.Windows.Forms.Label orLabel;
+        private System.Windows.Forms.Label waitLabel;
     }
 }
 
