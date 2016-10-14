@@ -116,6 +116,7 @@
             this.menuGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.menuGroupBox.Location = new System.Drawing.Point(0, 0);
             this.menuGroupBox.Name = "menuGroupBox";
+            this.menuGroupBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.menuGroupBox.Size = new System.Drawing.Size(207, 533);
             this.menuGroupBox.TabIndex = 0;
             this.menuGroupBox.TabStop = false;
@@ -218,9 +219,9 @@
             this.genStatusLabel.AutoSize = true;
             this.genStatusLabel.Location = new System.Drawing.Point(3, 6);
             this.genStatusLabel.Name = "genStatusLabel";
-            this.genStatusLabel.Size = new System.Drawing.Size(214, 13);
+            this.genStatusLabel.Size = new System.Drawing.Size(172, 13);
             this.genStatusLabel.TabIndex = 6;
-            this.genStatusLabel.Text = "Sending share request to [PLAYER] (1/n) ...";
+            this.genStatusLabel.Text = "Preparing share requests delivery...";
             // 
             // genShareButton
             // 

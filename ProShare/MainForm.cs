@@ -20,9 +20,12 @@ namespace ProShare
         private string genEmptyName = "Enter a name";
         private string genEmptyText = "Enter a text here...";
         private string genEmptyFile = "Select a file";
-        private string genEmptyPlayer = "Enter an username (e.g., [USERNAME])"; //NANTI GANTI PAKE USERNAME!!
         private string genPlayersCount1 = "Add ";
         private string genPlayersCount2 = " players";
+        private string genEmptyPlayer;
+        private string genEmptyPlayer1 = "Enter an username (e.g., ";
+        private string genEmptyPlayer2 = ")";
+        private string genFirstStatus = "Sending share requests...";
 
         public MainForm()
         {
@@ -37,9 +40,15 @@ namespace ProShare
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            //TEST
+            username = "fauzan";
+            //TEST
+
             this.MaximizeBox = false;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = ColorTranslator.FromHtml("#00B0F0");
+
+            menuGroupBox.Text = "Hello, " + username + "!";
 
             /*              GENERATE initializations            */
             genSecretGroupBox.Visible = false; //MIGHT BE changed??
@@ -59,6 +68,8 @@ namespace ProShare
             genKNumericUpDown.ValueChanged += GenKNumericUpDown_ValueChanged;
             genNNumericUpDown.ValueChanged += GenNNumericUpDown_ValueChanged;
 
+            genEmptyPlayer = genEmptyPlayer1 + username + genEmptyPlayer2;
+            genPlayerTextBox.Text = genEmptyPlayer;
             int numPlayersLeft = (int)genNNumericUpDown.Value - genPlayersListBox.Items.Count;
             genPlayersGroupBox.Text = genPlayersCount1 + numPlayersLeft.ToString() + genPlayersCount2;
             genRemoveButton.Enabled = false;
@@ -69,6 +80,9 @@ namespace ProShare
             genPlayersListBox.SelectedIndexChanged += GenPlayersListBox_SelectedIndexChanged;
             genPlayersListBox.KeyDown += GenPlayersListBox_KeyDown;
 
+            genStatusLabel.Text = genFirstStatus;
+            genStatusLabel.Visible = false;
+            genDontCloseLabel.Visible = false;
             genShareButton.Enabled = false;
 
         }
@@ -276,6 +290,7 @@ namespace ProShare
                     genPlayersGroupBox.Text = genPlayersCount1 + numPlayersLeft.ToString() + genPlayersCount2;
                     if(numPlayersLeft == 0)
                     {
+                        genPlayerTextBox.Text = "";
                         genAddButton.Enabled = false;
                         genNNumericUpDown.Minimum = genNNumericUpDown.Value;
                     }
@@ -316,7 +331,66 @@ namespace ProShare
 
         private void genShareButton_Click(object sender, EventArgs e)
         {
+            string schemeName = genNameTextBox.Text;
+            byte k = (byte)genKNumericUpDown.Value;
+            byte n = (byte)genNNumericUpDown.Value;
+            List<string> players = genPlayersListBox.Items.Cast<string>().ToList();
+            try
+            {
+                DatabaseHandler.Connect();
+                try
+                {
+                    int checkRes = DatabaseHandler.DoAccountsExist(players);
+                    if(checkRes == 1)
+                    {
+                        DatabaseHandler.Close(); 
+                        DatabaseHandler.Connect(); //reopen SQL connection
+                        int addRes = DatabaseHandler.AddScheme(schemeName, k, n); //try to add scheme
+                        if (addRes == 1) //success
+                        {
+                            genStatusLabel.Text = genFirstStatus;
+                            genStatusLabel.Visible = true;
+                            genDontCloseLabel.Visible = true;
 
+                            DatabaseHandler.AddPlayers(schemeName, players); //add players to db
+
+                            MQHandler.Connect();
+                            int counter = 1;
+                            foreach(string player in players)
+                            {
+                                MQHandler.SendShareRequest(schemeName, username, player);
+                                //genStatusLabel.Text = "Sending share request to " + player + " (" + counter + "/" + players.Count + ")...";
+                                counter++;
+                            }
+                            MQHandler.Close();
+
+                            MessageBox.Show("Share requests were sent sucessfully", "Share Requests Delivery Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            genStatusLabel.Visible = false;
+                            genStatusLabel.Text = genFirstStatus;
+                            genDontCloseLabel.Visible = false;
+                        }
+                        else if (addRes == 0) //failed, scheme already exists
+                        {
+                            MessageBox.Show("Scheme with that name already exists. Please choose different name.", "Share Requests Delivery Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                        //else catch exception
+                    }
+                    else if(checkRes == 0) //One or more player does not exist
+                    {
+                        MessageBox.Show("A player's name(s) does not exist. Please check it again.", "Share Requests Delivery Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }                    
+                    //else catch exception
+                }
+                catch (MySql.Data.MySqlClient.MySqlException ex)
+                {
+                    MessageBox.Show(ex.Message, "Unexpected " + ex.Number + " Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                DatabaseHandler.Close();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                MessageBox.Show(ex.Message, "Database Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /*      Other Methods       */

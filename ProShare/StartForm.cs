@@ -86,13 +86,13 @@ namespace ProShare
             {
                 try
                 {
-                    AccountDatabase.Connect();
+                    DatabaseHandler.Connect();
                     string username = usernameTextBox.Text;
                     string password = passwordTextBox.Text;
                     password = HashSHA256(password);
                     try
                     {
-                        int result = AccountDatabase.isExist(username, password);
+                        int result = DatabaseHandler.DoesAccountExist(username, password);
                         if(result == 1) //success
                         {
                             waitLabel.Visible = true;
@@ -116,7 +116,7 @@ namespace ProShare
                     {
                         MessageBox.Show(ex.Message, "Unexpected " + ex.Number + " Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    AccountDatabase.CloseConnection();
+                    DatabaseHandler.Close();
                 }
                 catch (MySql.Data.MySqlClient.MySqlException ex)
                 {
@@ -136,21 +136,21 @@ namespace ProShare
             {
                 try
                 {
-                    AccountDatabase.Connect();
+                    DatabaseHandler.Connect();
                     string username = usernameTextBox.Text;
                     string password = passwordTextBox.Text;
                     password = HashSHA256(password);
                     try
                     {
-                        int result = AccountDatabase.Add(username, password);
+                        int result = DatabaseHandler.AddAccount(username, password);
                         if(result ==  1) //success
                         {
                             waitLabel.Visible = true;
 
                             //Create user queue
-                            MessageQueue.Connect();
-                            MessageQueue.CreateQueue(username);
-                            MessageQueue.Close();
+                            MQHandler.Connect();
+                            MQHandler.CreateQueue(username);
+                            MQHandler.Close();
 
                             //Form transition
                             this.Hide();
@@ -169,7 +169,7 @@ namespace ProShare
                         MessageBox.Show(ex.Message, "Unexpected " + ex.Number + " Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
 
-                    AccountDatabase.CloseConnection();
+                    DatabaseHandler.Close();
                 }
                 catch (MySql.Data.MySqlClient.MySqlException ex)
                 {
