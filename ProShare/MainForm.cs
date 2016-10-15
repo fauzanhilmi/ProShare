@@ -14,7 +14,12 @@ namespace ProShare
 {
     public partial class MainForm : Form
     {
+        /*      MainForm attributes         */
+        private string defaultNotificationsText = "Notifications ("; //minus the right side!
         private string username;
+        private IDictionary<ulong, IDictionary<string, object>> ntfDictionary; //dictionary of notifications
+
+        private delegate void SetTextCallback(Control obj, string text); //for changing control object's text when notification (MQ message) arrived
 
         /*      GENERATE attributes         */
         private string genEmptyName = "Enter a name";
@@ -40,6 +45,7 @@ namespace ProShare
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            /*              MainForm initializations            */
             //TEST
             username = "fauzan";
             //TEST
@@ -49,6 +55,13 @@ namespace ProShare
             this.BackColor = ColorTranslator.FromHtml("#00B0F0");
 
             menuGroupBox.Text = "Hello, " + username + "!";
+            notificationsButton.Text = defaultNotificationsText + "0)";
+
+            this.FormClosing += MainForm_FormClosing;
+
+            MQHandler.Connect();
+            MQHandler.GetMessage(username, ProcessNotification); //Listening to incoming notifications
+            ntfDictionary = new Dictionary<ulong, IDictionary<string, object>>();
 
             /*              GENERATE initializations            */
             genSecretGroupBox.Visible = false; //MIGHT BE changed??
@@ -84,7 +97,44 @@ namespace ProShare
             genStatusLabel.Visible = false;
             genDontCloseLabel.Visible = false;
             genShareButton.Enabled = false;
+        }
 
+        /*          MainForm methods            */
+        private void ProcessNotification(ulong DeliveryTag, IDictionary<string, object> headers, byte[] message)
+        {
+            IDictionary<string, object> contents = new Dictionary<string, object>(headers);
+            contents.Add("Message", message);
+            ntfDictionary.Add(DeliveryTag, contents);
+
+            //changing number of notifications on notificationsButton
+            ulong numOfNotifications = (ulong) notificationsButton.Text[15] - '0'; //change index if the text is changed!
+            Debug.WriteLine(notificationsButton.Text + " : " + numOfNotifications);
+            numOfNotifications++;
+            string newNotificationsText = defaultNotificationsText + numOfNotifications + ")";
+            SetText(notificationsButton, newNotificationsText);
+
+            //TEST
+            /*Debug.WriteLine(">" + DeliveryTag);
+            foreach(var item in contents)
+            {
+                Debug.WriteLine(item.Key + " : " + Encoding.ASCII.GetString((byte[]) item.Value));
+            }
+            Debug.WriteLine("");*/
+        }
+
+        private void SetText(Control obj, string text )
+        {
+            //Debug.WriteLine(text);
+            if(obj.InvokeRequired)
+            {
+                SetTextCallback stc = new SetTextCallback(SetText);
+                //this.BeginInvoke(stc, new object[] { obj, text });
+                this.Invoke(stc, new object[] { obj, text });
+            }
+            else
+            {
+                obj.Text = text;
+            }
         }
 
         private void operationsButton_Click(object sender, EventArgs e)
@@ -94,7 +144,12 @@ namespace ProShare
 
         private void requestsButton_Click(object sender, EventArgs e)
         {
-            stackPanel.SelectTab("Requests");
+            stackPanel.SelectTab("Notifications");
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            MQHandler.Close();
         }
 
         /*          GENERATE methods            */
@@ -354,7 +409,7 @@ namespace ProShare
 
                             DatabaseHandler.AddPlayers(schemeName, players); //add players to db
 
-                            MQHandler.Connect();
+                            //MQHandler.Connect();
                             int counter = 1;
                             foreach(string player in players)
                             {
@@ -362,7 +417,7 @@ namespace ProShare
                                 //genStatusLabel.Text = "Sending share request to " + player + " (" + counter + "/" + players.Count + ")...";
                                 counter++;
                             }
-                            MQHandler.Close();
+                            //MQHandler.Close();
 
                             MessageBox.Show("Share requests were sent sucessfully", "Share Requests Delivery Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             genStatusLabel.Visible = false;

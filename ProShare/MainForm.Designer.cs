@@ -31,9 +31,8 @@
             this.panel = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.menuGroupBox = new System.Windows.Forms.GroupBox();
-            this.requestsButton = new System.Windows.Forms.Button();
+            this.notificationsButton = new System.Windows.Forms.Button();
             this.operationsButton = new System.Windows.Forms.Button();
-            this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.stackPanel = new ProShare.StackPanel();
             this.Operations = new System.Windows.Forms.TabPage();
             this.operationsTabControl = new System.Windows.Forms.TabControl();
@@ -61,8 +60,16 @@
             this.genNameTextBox = new System.Windows.Forms.TextBox();
             this.reconstructTabPage = new System.Windows.Forms.TabPage();
             this.udpateTabPage = new System.Windows.Forms.TabPage();
-            this.Requests = new System.Windows.Forms.TabPage();
+            this.Notifications = new System.Windows.Forms.TabPage();
+            this.ntfTabControl = new System.Windows.Forms.TabControl();
+            this.ntfTabPage = new System.Windows.Forms.TabPage();
+            this.ntfPanel = new System.Windows.Forms.Panel();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.ntfActionGroupBox = new System.Windows.Forms.GroupBox();
             this.Profile = new System.Windows.Forms.TabPage();
+            this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -80,6 +87,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.genKNumericUpDown)).BeginInit();
             this.genSecretGroupBox.SuspendLayout();
             this.genNameGroupBox.SuspendLayout();
+            this.Notifications.SuspendLayout();
+            this.ntfTabControl.SuspendLayout();
+            this.ntfTabPage.SuspendLayout();
+            this.ntfPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel
@@ -111,7 +122,7 @@
             // 
             // menuGroupBox
             // 
-            this.menuGroupBox.Controls.Add(this.requestsButton);
+            this.menuGroupBox.Controls.Add(this.notificationsButton);
             this.menuGroupBox.Controls.Add(this.operationsButton);
             this.menuGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.menuGroupBox.Location = new System.Drawing.Point(0, 0);
@@ -122,16 +133,16 @@
             this.menuGroupBox.TabStop = false;
             this.menuGroupBox.Text = "Hello, [USERNAME]!";
             // 
-            // requestsButton
+            // notificationsButton
             // 
-            this.requestsButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.requestsButton.Location = new System.Drawing.Point(3, 62);
-            this.requestsButton.Name = "requestsButton";
-            this.requestsButton.Size = new System.Drawing.Size(201, 46);
-            this.requestsButton.TabIndex = 1;
-            this.requestsButton.Text = "Requests";
-            this.requestsButton.UseVisualStyleBackColor = true;
-            this.requestsButton.Click += new System.EventHandler(this.requestsButton_Click);
+            this.notificationsButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.notificationsButton.Location = new System.Drawing.Point(3, 62);
+            this.notificationsButton.Name = "notificationsButton";
+            this.notificationsButton.Size = new System.Drawing.Size(201, 46);
+            this.notificationsButton.TabIndex = 1;
+            this.notificationsButton.Text = "Notifications (0)";
+            this.notificationsButton.UseVisualStyleBackColor = true;
+            this.notificationsButton.Click += new System.EventHandler(this.requestsButton_Click);
             // 
             // operationsButton
             // 
@@ -147,7 +158,7 @@
             // stackPanel
             // 
             this.stackPanel.Controls.Add(this.Operations);
-            this.stackPanel.Controls.Add(this.Requests);
+            this.stackPanel.Controls.Add(this.Notifications);
             this.stackPanel.Controls.Add(this.Profile);
             this.stackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.stackPanel.Location = new System.Drawing.Point(0, 0);
@@ -447,14 +458,94 @@
             this.udpateTabPage.Text = "Update Shares";
             this.udpateTabPage.UseVisualStyleBackColor = true;
             // 
-            // Requests
+            // Notifications
             // 
-            this.Requests.BackColor = System.Drawing.SystemColors.Control;
-            this.Requests.Location = new System.Drawing.Point(4, 22);
-            this.Requests.Name = "Requests";
-            this.Requests.Size = new System.Drawing.Size(537, 507);
-            this.Requests.TabIndex = 2;
-            this.Requests.Text = "Requests";
+            this.Notifications.BackColor = System.Drawing.SystemColors.Control;
+            this.Notifications.Controls.Add(this.ntfTabControl);
+            this.Notifications.Location = new System.Drawing.Point(4, 22);
+            this.Notifications.Name = "Notifications";
+            this.Notifications.Size = new System.Drawing.Size(537, 507);
+            this.Notifications.TabIndex = 2;
+            this.Notifications.Text = "Notifications";
+            // 
+            // ntfTabControl
+            // 
+            this.ntfTabControl.Controls.Add(this.ntfTabPage);
+            this.ntfTabControl.Location = new System.Drawing.Point(3, 3);
+            this.ntfTabControl.Name = "ntfTabControl";
+            this.ntfTabControl.SelectedIndex = 0;
+            this.ntfTabControl.Size = new System.Drawing.Size(538, 529);
+            this.ntfTabControl.TabIndex = 0;
+            // 
+            // ntfTabPage
+            // 
+            this.ntfTabPage.Controls.Add(this.ntfPanel);
+            this.ntfTabPage.Controls.Add(this.ntfActionGroupBox);
+            this.ntfTabPage.Location = new System.Drawing.Point(4, 22);
+            this.ntfTabPage.Name = "ntfTabPage";
+            this.ntfTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.ntfTabPage.Size = new System.Drawing.Size(530, 503);
+            this.ntfTabPage.TabIndex = 0;
+            this.ntfTabPage.Text = "Notifications";
+            this.ntfTabPage.UseVisualStyleBackColor = true;
+            // 
+            // ntfPanel
+            // 
+            this.ntfPanel.Controls.Add(this.button3);
+            this.ntfPanel.Controls.Add(this.button2);
+            this.ntfPanel.Controls.Add(this.button1);
+            this.ntfPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.ntfPanel.Location = new System.Drawing.Point(3, 3);
+            this.ntfPanel.Name = "ntfPanel";
+            this.ntfPanel.Size = new System.Drawing.Size(524, 245);
+            this.ntfPanel.TabIndex = 2;
+            // 
+            // button3
+            // 
+            this.button3.Dock = System.Windows.Forms.DockStyle.Top;
+            this.button3.FlatAppearance.BorderColor = System.Drawing.SystemColors.ScrollBar;
+            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button3.Location = new System.Drawing.Point(0, 54);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(524, 27);
+            this.button3.TabIndex = 4;
+            this.button3.Text = "button3";
+            this.button3.UseVisualStyleBackColor = false;
+            // 
+            // button2
+            // 
+            this.button2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.button2.FlatAppearance.BorderColor = System.Drawing.SystemColors.ScrollBar;
+            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button2.Location = new System.Drawing.Point(0, 27);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(524, 27);
+            this.button2.TabIndex = 3;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = false;
+            // 
+            // button1
+            // 
+            this.button1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.button1.FlatAppearance.BorderColor = System.Drawing.SystemColors.ScrollBar;
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Location = new System.Drawing.Point(0, 0);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(524, 27);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "[Share Request] fauzan wants to give you a share on scheme \"asdf\"";
+            this.button1.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.button1.UseVisualStyleBackColor = false;
+            // 
+            // ntfActionGroupBox
+            // 
+            this.ntfActionGroupBox.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.ntfActionGroupBox.Location = new System.Drawing.Point(3, 254);
+            this.ntfActionGroupBox.Name = "ntfActionGroupBox";
+            this.ntfActionGroupBox.Size = new System.Drawing.Size(524, 246);
+            this.ntfActionGroupBox.TabIndex = 1;
+            this.ntfActionGroupBox.TabStop = false;
+            this.ntfActionGroupBox.Text = "Action";
             // 
             // Profile
             // 
@@ -497,6 +588,10 @@
             this.genSecretGroupBox.PerformLayout();
             this.genNameGroupBox.ResumeLayout(false);
             this.genNameGroupBox.PerformLayout();
+            this.Notifications.ResumeLayout(false);
+            this.ntfTabControl.ResumeLayout(false);
+            this.ntfTabPage.ResumeLayout(false);
+            this.ntfPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -514,8 +609,8 @@
         private StackPanel stackPanel;
         private System.Windows.Forms.TabPage Operations;
         private System.Windows.Forms.TabPage Profile;
-        private System.Windows.Forms.TabPage Requests;
-        private System.Windows.Forms.Button requestsButton;
+        private System.Windows.Forms.TabPage Notifications;
+        private System.Windows.Forms.Button notificationsButton;
         private System.Windows.Forms.TextBox genFileTextBox;
         private System.Windows.Forms.Button genBrowseButton;
         private System.Windows.Forms.OpenFileDialog genOpenFileDialog;
@@ -538,5 +633,12 @@
         private System.Windows.Forms.Panel genStatusPanel;
         private System.Windows.Forms.Label genStatusLabel;
         private System.Windows.Forms.Label genDontCloseLabel;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TabControl ntfTabControl;
+        private System.Windows.Forms.TabPage ntfTabPage;
+        private System.Windows.Forms.GroupBox ntfActionGroupBox;
+        private System.Windows.Forms.Panel ntfPanel;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button2;
     }
 }

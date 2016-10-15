@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace ProShare
 {
@@ -54,6 +57,25 @@ namespace ProShare
             props.Headers.Add("Recipient", player);
 
             model.BasicPublish(generateExchange, player, props, message);
+        }
+
+        public static void GetMessage(string queue, Action<ulong, IDictionary<string, object>, byte[]> callback)
+        {
+            ulong dTag = 0;
+            EventingBasicConsumer consumer = new EventingBasicConsumer(model);
+            consumer.Received += (o, e) => 
+            {
+                callback.Invoke(e.DeliveryTag, e.BasicProperties.Headers, e.Body);
+                dTag = e.DeliveryTag;
+                //TEST
+                /*if (dTag == 2)
+                {
+                    Debug.WriteLine("ack");
+                    model.BasicAck(dTag, false);
+                }*/
+            };
+            model.BasicConsume(queue, false, consumer);
+            //Debug.WriteLine(dTag);
         }
 
         public static void Close()
