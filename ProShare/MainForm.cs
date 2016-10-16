@@ -20,6 +20,7 @@ namespace ProShare
         private IDictionary<ulong, IDictionary<string, object>> ntfDictionary; //dictionary of notifications
 
         private delegate void SetTextCallback(Control obj, string text); //for changing control object's text when notification (MQ message) arrived
+        private delegate void AddNtfButtonCallback(ulong DeliveryTag, IDictionary<string, object> contents);
 
         /*      GENERATE attributes         */
         private string genEmptyName = "Enter a name";
@@ -47,7 +48,7 @@ namespace ProShare
         {
             /*              MainForm initializations            */
             //TEST
-            username = "fauzan";
+            username = "dono";
             //TEST
 
             this.MaximizeBox = false;
@@ -113,13 +114,16 @@ namespace ProShare
             string newNotificationsText = defaultNotificationsText + numOfNotifications + ")";
             SetText(notificationsButton, newNotificationsText);
 
+            //adding notification button
+            AddNtfButton(DeliveryTag, contents);
+
             //TEST
-            /*Debug.WriteLine(">" + DeliveryTag);
+            Debug.WriteLine(">" + DeliveryTag);
             foreach(var item in contents)
             {
-                Debug.WriteLine(item.Key + " : " + Encoding.ASCII.GetString((byte[]) item.Value));
+                Debug.WriteLine(item.Key + " : " + Encoding.ASCII.GetString((byte[]) item.Value) + " (" + item.Value.ToString() + ")");
             }
-            Debug.WriteLine("");*/
+            Debug.WriteLine("");
         }
 
         private void SetText(Control obj, string text )
@@ -134,6 +138,78 @@ namespace ProShare
             else
             {
                 obj.Text = text;
+            }
+        }
+
+        private void AddNtfButton(ulong DeliveryTag, IDictionary<string, object> contents)
+        {
+            //TEST
+            foreach (var item in contents)
+            {
+                Debug.WriteLine(item.Key + " : " + Encoding.ASCII.GetString((byte[])item.Value) + " (" + item.Value.ToString() + ")");
+            }
+            Debug.WriteLine("");
+
+            Button newButton = new Button();
+            newButton.Tag = DeliveryTag;
+            newButton.Name = "ntfButton" + DeliveryTag;
+            newButton.BackColor = SystemColors.GradientInactiveCaption;
+            newButton.FlatStyle = FlatStyle.Flat;
+            newButton.FlatAppearance.BorderColor = SystemColors.ScrollBar;
+            newButton.Dock = DockStyle.Top;
+            newButton.TextAlign = ContentAlignment.TopLeft;
+
+            //setting the button text
+            string text = "";
+            string type = Encoding.ASCII.GetString((byte[])contents["Type"]);
+            string operation = Encoding.ASCII.GetString((byte[])contents["Operation"]);
+            string scheme = Encoding.ASCII.GetString((byte[])contents["Scheme"]);
+            string sender = Encoding.ASCII.GetString((byte[])contents["Sender"]);
+            if (type == "REQUEST")
+            {
+                switch (operation) 
+                {
+                    case "Generate":
+                        {
+                            text = "[Share Request] " + sender + " invites you to join scheme '" + scheme + "'";
+                            break;
+                        }
+                    case "Reconstruct":
+                        {
+
+                            break;
+                        }
+                    case "Default":
+                        {
+
+                            break;
+                        }
+                    default:
+                        {
+                            Debug.WriteLine("Something went wrong (Operation)");
+                            break;
+                        }
+                }
+            }
+            else if(type == "RESPONSE")
+            {
+
+            }
+            else
+            {
+                Debug.WriteLine("Something went wrong (Type)");
+            }
+            newButton.Text = text;
+
+            //attach button to ntfPanel
+            if(ntfPanel.InvokeRequired)
+            {
+                AddNtfButtonCallback anc = new AddNtfButtonCallback(AddNtfButton);
+                this.Invoke(anc, new object[] { DeliveryTag, contents});
+            }
+            else
+            {
+                ntfPanel.Controls.Add(newButton);
             }
         }
 
@@ -400,7 +476,7 @@ namespace ProShare
                     {
                         DatabaseHandler.Close(); 
                         DatabaseHandler.Connect(); //reopen SQL connection
-                        int addRes = DatabaseHandler.AddScheme(schemeName, k, n); //try to add scheme
+                        int addRes = DatabaseHandler.AddScheme(schemeName, username, k, n); //try to add scheme UNTESTED FOR DEALER!
                         if (addRes == 1) //success
                         {
                             genStatusLabel.Text = genFirstStatus;

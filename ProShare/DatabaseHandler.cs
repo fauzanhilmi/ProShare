@@ -216,17 +216,18 @@ namespace ProShare
         }
 
         /* ************************ SCHEME-related methods ******************* */
-        /* Add new scheme with given name, k value, and n value
+        /* UNTESTED UNTUK DEALER! */
+        /* Add new scheme with given name, k value, and n value 
          * Will return 3 possible return codes
          * > 1      : Operation is successfully executed 
          * > 0      : Record already exists; Operation is not executed 
          * > else   : Unknown error, return code = SQL error code; Operation is not executed  */
-        public static int AddScheme(string name, byte k, byte n)
+        public static int AddScheme(string scheme, string dealer, byte k, byte n) /* UNTESTED UNTUK DEALER! */
         {
             int returnCode = 1;
             try
             {
-                string query = "INSERT INTO scheme (name, k, n)  VALUES ('" + name + "', '" + k + "', '" + n + "')";
+                string query = "INSERT INTO scheme (name, dealer, k, n)  VALUES ('" + scheme + "', '"  + dealer+ "', '" + k + "', '" + n + "')";
                 Debug.WriteLine(query);
                 MySqlCommand cmd = new MySqlCommand(query, SqlConn);
                 cmd.ExecuteNonQuery();

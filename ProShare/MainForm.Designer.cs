@@ -64,10 +64,11 @@
             this.ntfTabControl = new System.Windows.Forms.TabControl();
             this.ntfTabPage = new System.Windows.Forms.TabPage();
             this.ntfPanel = new System.Windows.Forms.Panel();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.ntfExampleBtn = new System.Windows.Forms.Button();
             this.ntfActionGroupBox = new System.Windows.Forms.GroupBox();
+            this.actionStackPanel = new ProShare.StackPanel();
+            this.confirmationTabPage = new System.Windows.Forms.TabPage();
+            this.browseFileTabPage = new System.Windows.Forms.TabPage();
             this.Profile = new System.Windows.Forms.TabPage();
             this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.panel.SuspendLayout();
@@ -91,6 +92,8 @@
             this.ntfTabControl.SuspendLayout();
             this.ntfTabPage.SuspendLayout();
             this.ntfPanel.SuspendLayout();
+            this.ntfActionGroupBox.SuspendLayout();
+            this.actionStackPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel
@@ -491,54 +494,31 @@
             // 
             // ntfPanel
             // 
-            this.ntfPanel.Controls.Add(this.button3);
-            this.ntfPanel.Controls.Add(this.button2);
-            this.ntfPanel.Controls.Add(this.button1);
+            this.ntfPanel.Controls.Add(this.ntfExampleBtn);
             this.ntfPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.ntfPanel.Location = new System.Drawing.Point(3, 3);
             this.ntfPanel.Name = "ntfPanel";
             this.ntfPanel.Size = new System.Drawing.Size(524, 245);
             this.ntfPanel.TabIndex = 2;
             // 
-            // button3
+            // ntfExampleBtn
             // 
-            this.button3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.button3.FlatAppearance.BorderColor = System.Drawing.SystemColors.ScrollBar;
-            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button3.Location = new System.Drawing.Point(0, 54);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(524, 27);
-            this.button3.TabIndex = 4;
-            this.button3.Text = "button3";
-            this.button3.UseVisualStyleBackColor = false;
-            // 
-            // button2
-            // 
-            this.button2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.button2.FlatAppearance.BorderColor = System.Drawing.SystemColors.ScrollBar;
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.Location = new System.Drawing.Point(0, 27);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(524, 27);
-            this.button2.TabIndex = 3;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = false;
-            // 
-            // button1
-            // 
-            this.button1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.button1.FlatAppearance.BorderColor = System.Drawing.SystemColors.ScrollBar;
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Location = new System.Drawing.Point(0, 0);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(524, 27);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "[Share Request] fauzan wants to give you a share on scheme \"asdf\"";
-            this.button1.TextAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.button1.UseVisualStyleBackColor = false;
+            this.ntfExampleBtn.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ntfExampleBtn.Dock = System.Windows.Forms.DockStyle.Top;
+            this.ntfExampleBtn.FlatAppearance.BorderColor = System.Drawing.SystemColors.ScrollBar;
+            this.ntfExampleBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ntfExampleBtn.Location = new System.Drawing.Point(0, 0);
+            this.ntfExampleBtn.Name = "ntfExampleBtn";
+            this.ntfExampleBtn.Size = new System.Drawing.Size(524, 27);
+            this.ntfExampleBtn.TabIndex = 2;
+            this.ntfExampleBtn.Text = "[Share Request] fauzan wants to give you a share on scheme \"asdf\"";
+            this.ntfExampleBtn.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.ntfExampleBtn.UseVisualStyleBackColor = false;
+            this.ntfExampleBtn.Visible = false;
             // 
             // ntfActionGroupBox
             // 
+            this.ntfActionGroupBox.Controls.Add(this.actionStackPanel);
             this.ntfActionGroupBox.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.ntfActionGroupBox.Location = new System.Drawing.Point(3, 254);
             this.ntfActionGroupBox.Name = "ntfActionGroupBox";
@@ -546,6 +526,37 @@
             this.ntfActionGroupBox.TabIndex = 1;
             this.ntfActionGroupBox.TabStop = false;
             this.ntfActionGroupBox.Text = "Action";
+            // 
+            // actionStackPanel
+            // 
+            this.actionStackPanel.Controls.Add(this.confirmationTabPage);
+            this.actionStackPanel.Controls.Add(this.browseFileTabPage);
+            this.actionStackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.actionStackPanel.Location = new System.Drawing.Point(3, 16);
+            this.actionStackPanel.Name = "actionStackPanel";
+            this.actionStackPanel.SelectedIndex = 0;
+            this.actionStackPanel.Size = new System.Drawing.Size(518, 227);
+            this.actionStackPanel.TabIndex = 0;
+            // 
+            // confirmationTabPage
+            // 
+            this.confirmationTabPage.Location = new System.Drawing.Point(4, 22);
+            this.confirmationTabPage.Name = "confirmationTabPage";
+            this.confirmationTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.confirmationTabPage.Size = new System.Drawing.Size(510, 201);
+            this.confirmationTabPage.TabIndex = 0;
+            this.confirmationTabPage.Text = "Confirmation";
+            this.confirmationTabPage.UseVisualStyleBackColor = true;
+            // 
+            // browseFileTabPage
+            // 
+            this.browseFileTabPage.Location = new System.Drawing.Point(4, 22);
+            this.browseFileTabPage.Name = "browseFileTabPage";
+            this.browseFileTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.browseFileTabPage.Size = new System.Drawing.Size(510, 201);
+            this.browseFileTabPage.TabIndex = 1;
+            this.browseFileTabPage.Text = "Browse File";
+            this.browseFileTabPage.UseVisualStyleBackColor = true;
             // 
             // Profile
             // 
@@ -592,6 +603,8 @@
             this.ntfTabControl.ResumeLayout(false);
             this.ntfTabPage.ResumeLayout(false);
             this.ntfPanel.ResumeLayout(false);
+            this.ntfActionGroupBox.ResumeLayout(false);
+            this.actionStackPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -633,12 +646,13 @@
         private System.Windows.Forms.Panel genStatusPanel;
         private System.Windows.Forms.Label genStatusLabel;
         private System.Windows.Forms.Label genDontCloseLabel;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button ntfExampleBtn;
         private System.Windows.Forms.TabControl ntfTabControl;
         private System.Windows.Forms.TabPage ntfTabPage;
         private System.Windows.Forms.GroupBox ntfActionGroupBox;
         private System.Windows.Forms.Panel ntfPanel;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button2;
+        private StackPanel actionStackPanel;
+        private System.Windows.Forms.TabPage confirmationTabPage;
+        private System.Windows.Forms.TabPage browseFileTabPage;
     }
 }
