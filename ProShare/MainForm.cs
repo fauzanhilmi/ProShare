@@ -48,7 +48,7 @@ namespace ProShare
         {
             /*              MainForm initializations            */
             //TEST
-            username = "dono";
+            //username = "fauzan";
             //TEST
 
             this.MaximizeBox = false;
@@ -98,6 +98,12 @@ namespace ProShare
             genStatusLabel.Visible = false;
             genDontCloseLabel.Visible = false;
             genShareButton.Enabled = false;
+
+            /*              Notification initializations            */
+            ntfConfLabel1.Visible = false;
+            ntfConfLabel2.Visible = false;
+            ntfConfButton1.Visible = false;
+            ntfConfButton2.Visible = false;
         }
 
         /*          MainForm methods            */
@@ -144,11 +150,11 @@ namespace ProShare
         private void AddNtfButton(ulong DeliveryTag, IDictionary<string, object> contents)
         {
             //TEST
-            foreach (var item in contents)
+            /*foreach (var item in contents)
             {
                 Debug.WriteLine(item.Key + " : " + Encoding.ASCII.GetString((byte[])item.Value) + " (" + item.Value.ToString() + ")");
             }
-            Debug.WriteLine("");
+            Debug.WriteLine("");*/
 
             Button newButton = new Button();
             newButton.Tag = DeliveryTag;
@@ -171,17 +177,17 @@ namespace ProShare
                 {
                     case "Generate":
                         {
-                            text = "[Share Request] " + sender + " invites you to join scheme '" + scheme + "'";
+                            text = "(Share Request) " + sender + " invites you to join scheme '" + scheme + "'";
                             break;
                         }
                     case "Reconstruct":
                         {
-
+                            //TODO
                             break;
                         }
                     case "Default":
                         {
-
+                            //TODO
                             break;
                         }
                     default:
@@ -193,13 +199,15 @@ namespace ProShare
             }
             else if(type == "RESPONSE")
             {
-
+                //TODO
             }
             else
             {
                 Debug.WriteLine("Something went wrong (Type)");
             }
             newButton.Text = text;
+
+            newButton.Click += NewButton_Click;
 
             //attach button to ntfPanel
             if(ntfPanel.InvokeRequired)
@@ -213,14 +221,68 @@ namespace ProShare
             }
         }
 
+        private void NewButton_Click(object button, EventArgs e)
+        {
+            //MessageBox.Show(((Button)sender).Tag.ToString());
+            ulong DeliveryTag = (ulong) ((Button)button).Tag;
+            string type = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Type"]);
+            string operation = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Operation"]);
+            string scheme = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Scheme"]);
+            string sender = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Sender"]);
+            if (type == "REQUEST")
+            {
+                switch (operation)
+                {
+                    case "Generate":
+                        {
+                            ntfActionStackPanel.SelectTab(0); //Action
+                            ntfConfLabel1.Text = sender + " wants you to join his secret sharing scheme " + scheme + " as a player";
+                            ntfConfLabel1.Visible = true;
+                            ntfConfLabel2.Text = "Click 'Accept' to accept this request. Otherwise, click 'Reject'";
+                            ntfConfLabel2.Visible = true;
+                            ntfConfButton1.Text = "Accept";
+                            ntfConfButton1.Visible = true;
+                            ntfConfButton2.Text = "Reject";
+                            ntfConfButton2.Visible = true;
+                            break;
+                        }
+                    case "Reconstruct":
+                        {
+                            //TODO
+                            break;
+                        }
+                    case "Default":
+                        {
+                            //TODO
+                            break;
+                        }
+                    default:
+                        {
+                            Debug.WriteLine("Something went wrong (Operation)");
+                            break;
+                        }
+                }
+            }
+            else if (type == "RESPONSE")
+            {
+                //TODO
+            }
+            else
+            {
+                Debug.WriteLine("Something went wrong (Type)");
+            }
+        }
+
         private void operationsButton_Click(object sender, EventArgs e)
         {
-            stackPanel.SelectTab("Operations");
+            //stackPanel.SelectTab("Operations");
+            stackPanel.SelectTab(0);
         }
 
         private void requestsButton_Click(object sender, EventArgs e)
         {
-            stackPanel.SelectTab("Notifications");
+            //stackPanel.SelectTab("Notifications");
+            stackPanel.SelectTab(1);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -479,25 +541,27 @@ namespace ProShare
                         int addRes = DatabaseHandler.AddScheme(schemeName, username, k, n); //try to add scheme UNTESTED FOR DEALER!
                         if (addRes == 1) //success
                         {
-                            genStatusLabel.Text = genFirstStatus;
+                            //genStatusLabel.Text = genFirstStatus;
                             genStatusLabel.Visible = true;
                             genDontCloseLabel.Visible = true;
 
                             DatabaseHandler.AddPlayers(schemeName, players); //add players to db
 
+                            //TEST
                             //MQHandler.Connect();
-                            int counter = 1;
-                            foreach(string player in players)
+                            /* foreach(string player in players)
                             {
-                                MQHandler.SendShareRequest(schemeName, username, player);
-                                //genStatusLabel.Text = "Sending share request to " + player + " (" + counter + "/" + players.Count + ")...";
-                                counter++;
-                            }
+                                //MQHandler.SendShareRequest(schemeName, username, player);
+                            }*/
                             //MQHandler.Close();
+
+                            MQHandler.SendShareRequests(schemeName, username, players);
+                            //TEST
+
 
                             MessageBox.Show("Share requests were sent sucessfully", "Share Requests Delivery Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             genStatusLabel.Visible = false;
-                            genStatusLabel.Text = genFirstStatus;
+                            //genStatusLabel.Text = genFirstStatus;
                             genDontCloseLabel.Visible = false;
                         }
                         else if (addRes == 0) //failed, scheme already exists

@@ -45,7 +45,7 @@ namespace ProShare
             macAddress = macAddress.Replace(":", "");
 
             //TEST
-            //macAddress = GetRandomMacAddress();
+            macAddress = GetRandomMacAddress();
             //macAddress = "A9D37DD1D8F0";
             //TEST
         }
@@ -159,6 +159,48 @@ namespace ProShare
                 }
             }
             catch (MySql.Data.MySqlClient.MySqlException ex) 
+            {
+                Debug.WriteLine(ex.Number + " " + ex.Message);
+                returnCode = ex.Number;
+                throw;
+            }
+            return returnCode;
+        }
+
+        /* DUMMY Check whether an account already exists or not
+         * MAC address is not considered
+         * Will return 3 possible return codes
+         * >  1      : Account is exist, username & password match
+         * >  0      : Account is exist, but given password don't match
+         * > -1      : Account (username) is not exist
+         * >  else   : Unknown error. Return code = MySQL error code */
+        public static int DoesAccountExistDUMMY(string username, string password)
+        {
+            int returnCode = -1; //default : not found
+            try
+            {
+                string query = "SELECT * FROM account WHERE username = '" + username + "'";
+                MySqlCommand cmd = new MySqlCommand(query, SqlConn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                Debug.WriteLine(query);
+                while (reader.Read())
+                {
+                    returnCode = 0; //found matching username, but not sure about the password
+                    Debug.WriteLine(reader[0] + " " + reader[1] + " " + reader[2]);
+                }
+                if (returnCode == 0)
+                {
+                    if (reader[2].ToString() == password)
+                    {
+                        returnCode = 1; //found matching password
+                    }
+                    else
+                    {
+                        returnCode = 0; //mismatch password
+                    }
+                }
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
             {
                 Debug.WriteLine(ex.Number + " " + ex.Message);
                 returnCode = ex.Number;

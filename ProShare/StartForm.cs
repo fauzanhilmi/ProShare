@@ -33,12 +33,30 @@ namespace ProShare
             waitLabel.Visible = false;
 
             usernameTextBox.Text = emptyUsernameText;
+            usernameTextBox.KeyDown += UsernameTextBox_KeyDown;
             usernameTextBox.GotFocus += UsernameTextBox_GotFocus;
             usernameTextBox.LostFocus += UsernameTextBox_LostFocus;
 
             passwordTextBox.Text = emptyPasswordText;
+            passwordTextBox.KeyDown += PasswordTextBox_KeyDown;
             passwordTextBox.GotFocus += PasswordTextBox_GotFocus;
             passwordTextBox.LostFocus += PasswordTextBox_LostFocus;    
+        }
+
+        private void UsernameTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                loginButton.PerformClick();
+            }
+        }
+
+        private void PasswordTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                loginButton.PerformClick();
+            }
         }
 
         private void UsernameTextBox_GotFocus(object sender, EventArgs e)
@@ -92,8 +110,11 @@ namespace ProShare
                     password = HashSHA256(password);
                     try
                     {
-                        int result = DatabaseHandler.DoesAccountExist(username, password);
-                        if(result == 1) //success
+                        //TEST
+                        //int result = DatabaseHandler.DoesAccountExist(username, password);
+                        //TEST
+                        int result = DatabaseHandler.DoesAccountExistDUMMY(username, password);
+                        if (result == 1) //success
                         {
                             waitLabel.Visible = true;
                             //Form transition

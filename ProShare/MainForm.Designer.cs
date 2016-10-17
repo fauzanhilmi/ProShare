@@ -33,6 +33,7 @@
             this.menuGroupBox = new System.Windows.Forms.GroupBox();
             this.notificationsButton = new System.Windows.Forms.Button();
             this.operationsButton = new System.Windows.Forms.Button();
+            this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.stackPanel = new ProShare.StackPanel();
             this.Operations = new System.Windows.Forms.TabPage();
             this.operationsTabControl = new System.Windows.Forms.TabControl();
@@ -66,11 +67,14 @@
             this.ntfPanel = new System.Windows.Forms.Panel();
             this.ntfExampleBtn = new System.Windows.Forms.Button();
             this.ntfActionGroupBox = new System.Windows.Forms.GroupBox();
-            this.actionStackPanel = new ProShare.StackPanel();
-            this.confirmationTabPage = new System.Windows.Forms.TabPage();
-            this.browseFileTabPage = new System.Windows.Forms.TabPage();
+            this.ntfActionStackPanel = new ProShare.StackPanel();
+            this.ntfConfTabPage = new System.Windows.Forms.TabPage();
+            this.ntfConfButton2 = new System.Windows.Forms.Button();
+            this.ntfConfButton1 = new System.Windows.Forms.Button();
+            this.ntfConfLabel2 = new System.Windows.Forms.Label();
+            this.ntfConfLabel1 = new System.Windows.Forms.Label();
+            this.ntfBrowseTabPage = new System.Windows.Forms.TabPage();
             this.Profile = new System.Windows.Forms.TabPage();
-            this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -93,7 +97,8 @@
             this.ntfTabPage.SuspendLayout();
             this.ntfPanel.SuspendLayout();
             this.ntfActionGroupBox.SuspendLayout();
-            this.actionStackPanel.SuspendLayout();
+            this.ntfActionStackPanel.SuspendLayout();
+            this.ntfConfTabPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel
@@ -128,6 +133,7 @@
             this.menuGroupBox.Controls.Add(this.notificationsButton);
             this.menuGroupBox.Controls.Add(this.operationsButton);
             this.menuGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.menuGroupBox.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.menuGroupBox.Location = new System.Drawing.Point(0, 0);
             this.menuGroupBox.Name = "menuGroupBox";
             this.menuGroupBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -139,7 +145,8 @@
             // notificationsButton
             // 
             this.notificationsButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.notificationsButton.Location = new System.Drawing.Point(3, 62);
+            this.notificationsButton.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.notificationsButton.Location = new System.Drawing.Point(3, 73);
             this.notificationsButton.Name = "notificationsButton";
             this.notificationsButton.Size = new System.Drawing.Size(201, 46);
             this.notificationsButton.TabIndex = 1;
@@ -150,7 +157,8 @@
             // operationsButton
             // 
             this.operationsButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.operationsButton.Location = new System.Drawing.Point(3, 16);
+            this.operationsButton.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.operationsButton.Location = new System.Drawing.Point(3, 27);
             this.operationsButton.Name = "operationsButton";
             this.operationsButton.Size = new System.Drawing.Size(201, 46);
             this.operationsButton.TabIndex = 0;
@@ -511,14 +519,14 @@
             this.ntfExampleBtn.Name = "ntfExampleBtn";
             this.ntfExampleBtn.Size = new System.Drawing.Size(524, 27);
             this.ntfExampleBtn.TabIndex = 2;
-            this.ntfExampleBtn.Text = "[Share Request] fauzan wants to give you a share on scheme \"asdf\"";
+            this.ntfExampleBtn.Text = "[Share Request] username1 invites you to join scheme \'test\'";
             this.ntfExampleBtn.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.ntfExampleBtn.UseVisualStyleBackColor = false;
             this.ntfExampleBtn.Visible = false;
             // 
             // ntfActionGroupBox
             // 
-            this.ntfActionGroupBox.Controls.Add(this.actionStackPanel);
+            this.ntfActionGroupBox.Controls.Add(this.ntfActionStackPanel);
             this.ntfActionGroupBox.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.ntfActionGroupBox.Location = new System.Drawing.Point(3, 254);
             this.ntfActionGroupBox.Name = "ntfActionGroupBox";
@@ -527,36 +535,76 @@
             this.ntfActionGroupBox.TabStop = false;
             this.ntfActionGroupBox.Text = "Action";
             // 
-            // actionStackPanel
+            // ntfActionStackPanel
             // 
-            this.actionStackPanel.Controls.Add(this.confirmationTabPage);
-            this.actionStackPanel.Controls.Add(this.browseFileTabPage);
-            this.actionStackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.actionStackPanel.Location = new System.Drawing.Point(3, 16);
-            this.actionStackPanel.Name = "actionStackPanel";
-            this.actionStackPanel.SelectedIndex = 0;
-            this.actionStackPanel.Size = new System.Drawing.Size(518, 227);
-            this.actionStackPanel.TabIndex = 0;
+            this.ntfActionStackPanel.Controls.Add(this.ntfConfTabPage);
+            this.ntfActionStackPanel.Controls.Add(this.ntfBrowseTabPage);
+            this.ntfActionStackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ntfActionStackPanel.Location = new System.Drawing.Point(3, 16);
+            this.ntfActionStackPanel.Name = "ntfActionStackPanel";
+            this.ntfActionStackPanel.SelectedIndex = 0;
+            this.ntfActionStackPanel.Size = new System.Drawing.Size(518, 227);
+            this.ntfActionStackPanel.TabIndex = 0;
             // 
-            // confirmationTabPage
+            // ntfConfTabPage
             // 
-            this.confirmationTabPage.Location = new System.Drawing.Point(4, 22);
-            this.confirmationTabPage.Name = "confirmationTabPage";
-            this.confirmationTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.confirmationTabPage.Size = new System.Drawing.Size(510, 201);
-            this.confirmationTabPage.TabIndex = 0;
-            this.confirmationTabPage.Text = "Confirmation";
-            this.confirmationTabPage.UseVisualStyleBackColor = true;
+            this.ntfConfTabPage.Controls.Add(this.ntfConfButton2);
+            this.ntfConfTabPage.Controls.Add(this.ntfConfButton1);
+            this.ntfConfTabPage.Controls.Add(this.ntfConfLabel2);
+            this.ntfConfTabPage.Controls.Add(this.ntfConfLabel1);
+            this.ntfConfTabPage.Location = new System.Drawing.Point(4, 22);
+            this.ntfConfTabPage.Name = "ntfConfTabPage";
+            this.ntfConfTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.ntfConfTabPage.Size = new System.Drawing.Size(510, 201);
+            this.ntfConfTabPage.TabIndex = 0;
+            this.ntfConfTabPage.Text = "Confirmation";
+            this.ntfConfTabPage.UseVisualStyleBackColor = true;
             // 
-            // browseFileTabPage
+            // ntfConfButton2
             // 
-            this.browseFileTabPage.Location = new System.Drawing.Point(4, 22);
-            this.browseFileTabPage.Name = "browseFileTabPage";
-            this.browseFileTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.browseFileTabPage.Size = new System.Drawing.Size(510, 201);
-            this.browseFileTabPage.TabIndex = 1;
-            this.browseFileTabPage.Text = "Browse File";
-            this.browseFileTabPage.UseVisualStyleBackColor = true;
+            this.ntfConfButton2.Location = new System.Drawing.Point(401, 125);
+            this.ntfConfButton2.Name = "ntfConfButton2";
+            this.ntfConfButton2.Size = new System.Drawing.Size(90, 35);
+            this.ntfConfButton2.TabIndex = 3;
+            this.ntfConfButton2.Text = "Reject";
+            this.ntfConfButton2.UseVisualStyleBackColor = true;
+            // 
+            // ntfConfButton1
+            // 
+            this.ntfConfButton1.Location = new System.Drawing.Point(291, 125);
+            this.ntfConfButton1.Name = "ntfConfButton1";
+            this.ntfConfButton1.Size = new System.Drawing.Size(87, 35);
+            this.ntfConfButton1.TabIndex = 2;
+            this.ntfConfButton1.Text = "Accept";
+            this.ntfConfButton1.UseVisualStyleBackColor = true;
+            // 
+            // ntfConfLabel2
+            // 
+            this.ntfConfLabel2.AutoSize = true;
+            this.ntfConfLabel2.Location = new System.Drawing.Point(6, 67);
+            this.ntfConfLabel2.Name = "ntfConfLabel2";
+            this.ntfConfLabel2.Size = new System.Drawing.Size(35, 13);
+            this.ntfConfLabel2.TabIndex = 1;
+            this.ntfConfLabel2.Text = "label3";
+            // 
+            // ntfConfLabel1
+            // 
+            this.ntfConfLabel1.AutoSize = true;
+            this.ntfConfLabel1.Location = new System.Drawing.Point(6, 15);
+            this.ntfConfLabel1.Name = "ntfConfLabel1";
+            this.ntfConfLabel1.Size = new System.Drawing.Size(35, 13);
+            this.ntfConfLabel1.TabIndex = 0;
+            this.ntfConfLabel1.Text = "label2";
+            // 
+            // ntfBrowseTabPage
+            // 
+            this.ntfBrowseTabPage.Location = new System.Drawing.Point(4, 22);
+            this.ntfBrowseTabPage.Name = "ntfBrowseTabPage";
+            this.ntfBrowseTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.ntfBrowseTabPage.Size = new System.Drawing.Size(510, 201);
+            this.ntfBrowseTabPage.TabIndex = 1;
+            this.ntfBrowseTabPage.Text = "Browse File";
+            this.ntfBrowseTabPage.UseVisualStyleBackColor = true;
             // 
             // Profile
             // 
@@ -604,7 +652,9 @@
             this.ntfTabPage.ResumeLayout(false);
             this.ntfPanel.ResumeLayout(false);
             this.ntfActionGroupBox.ResumeLayout(false);
-            this.actionStackPanel.ResumeLayout(false);
+            this.ntfActionStackPanel.ResumeLayout(false);
+            this.ntfConfTabPage.ResumeLayout(false);
+            this.ntfConfTabPage.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -651,8 +701,12 @@
         private System.Windows.Forms.TabPage ntfTabPage;
         private System.Windows.Forms.GroupBox ntfActionGroupBox;
         private System.Windows.Forms.Panel ntfPanel;
-        private StackPanel actionStackPanel;
-        private System.Windows.Forms.TabPage confirmationTabPage;
-        private System.Windows.Forms.TabPage browseFileTabPage;
+        private StackPanel ntfActionStackPanel;
+        private System.Windows.Forms.TabPage ntfConfTabPage;
+        private System.Windows.Forms.TabPage ntfBrowseTabPage;
+        private System.Windows.Forms.Label ntfConfLabel2;
+        private System.Windows.Forms.Label ntfConfLabel1;
+        private System.Windows.Forms.Button ntfConfButton2;
+        private System.Windows.Forms.Button ntfConfButton1;
     }
 }

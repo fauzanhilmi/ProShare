@@ -15,13 +15,14 @@ namespace ProShare
         private static string server = "localhost";
         private static string uid = "guest";
         private static string pwd = "guest";
-        private static string generateExchange = "generate";
+
+        //not needed anymore?
+        /*private static string generateExchange = "generate";
         private static string reconstructExchange = "reconstruct";
-        private static string updateExchange = "update";
+        private static string updateExchange = "update";*/
 
         private static IConnection conn;
         private static IModel model;
-
 
         public static void Connect()
         {
@@ -37,12 +38,14 @@ namespace ProShare
         public static void CreateQueue(string name)
         {
             model.QueueDeclare(name, true, false, false);
-            model.QueueBind(name, generateExchange, name);
+
+            //not needed anymore?
+            /*model.QueueBind(name, generateExchange, name);
             model.QueueBind(name, reconstructExchange, name);
-            model.QueueBind(name, updateExchange, name);
+            model.QueueBind(name, updateExchange, name);*/
         }
 
-        public static void SendShareRequest(string scheme, string dealer, string player)
+        /*public static void SendShareRequest(string scheme, string dealer, string player)
         {
             byte[] message = System.Text.Encoding.UTF8.GetBytes(""); //not important
 
@@ -57,6 +60,31 @@ namespace ProShare
             props.Headers.Add("Recipient", player);
 
             model.BasicPublish(generateExchange, player, props, message);
+        }*/
+
+        public static void SendShareRequests(string scheme, string dealer, List<string> players)
+        {
+            model.ExchangeDeclare(scheme, ExchangeType.Topic, true, false);
+
+            foreach(string player in players)
+            {
+                //Bind every player into exchange
+                model.QueueBind(player, scheme, "#");
+                model.QueueBind(player, scheme, player);
+            }
+
+            byte[] message = System.Text.Encoding.UTF8.GetBytes(""); //not important
+            IBasicProperties props = model.CreateBasicProperties();
+            props.ContentType = "text/plain";
+            props.DeliveryMode = 2;
+            props.Headers = new Dictionary<string, object>();
+            props.Headers.Add("Type", "REQUEST");
+            props.Headers.Add("Operation", "Generate");
+            props.Headers.Add("Scheme", scheme);
+            props.Headers.Add("Sender", dealer);
+
+            model.BasicPublish(scheme, "#", props, message);
+
         }
 
         public static void GetMessage(string queue, Action<ulong, IDictionary<string, object>, byte[]> callback)
