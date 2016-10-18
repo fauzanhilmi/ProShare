@@ -258,7 +258,6 @@ namespace ProShare
         }
 
         /* ************************ SCHEME-related methods ******************* */
-        /* UNTESTED UNTUK DEALER! */
         /* Add new scheme with given name, k value, and n value 
          * Will return 3 possible return codes
          * > 1      : Operation is successfully executed 
@@ -318,6 +317,70 @@ namespace ProShare
             }
             return returnCode;
         }*/
+
+        public static int IncrementConfirmations(string scheme)
+        {
+            int returnCode = 1;
+            try
+            {
+                string query = "UPDATE scheme SET num_of_confirmations = num_of_confirmations + 1 WHERE name = '" + scheme + "'";
+                Debug.WriteLine(query);
+                MySqlCommand cmd = new MySqlCommand(query, SqlConn);
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                Debug.WriteLine(ex.Number + " " + ex.Message);
+                returnCode = ex.Number;
+                throw;
+            }
+            return returnCode;
+        }
+
+        public static int ResetConfirmations(string scheme)
+        {
+            int returnCode = 1;
+            try
+            {
+                string query = "UPDATE scheme SET num_of_confirmations = '0' WHERE name = '" + scheme + "'";
+                Debug.WriteLine(query);
+                MySqlCommand cmd = new MySqlCommand(query, SqlConn);
+                cmd.ExecuteNonQuery();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                Debug.WriteLine(ex.Number + " " + ex.Message);
+                returnCode = ex.Number;
+                throw;
+            }
+            return returnCode;
+        }
+
+        //Will delete players too
+        public static int DeleteScheme(string scheme)
+        {
+            int returnCode = 1;
+            try
+            {
+                string query = "DELETE FROM scheme WHERE name = '" + scheme + "'";
+                Debug.WriteLine(query);
+                MySqlCommand cmd = new MySqlCommand(query, SqlConn);
+                cmd.ExecuteNonQuery();
+
+                query = "DELETE FROM players WHERE scheme = '" + scheme + "'";
+                Debug.WriteLine(query);
+                cmd = new MySqlCommand(query, SqlConn);
+                cmd.ExecuteNonQuery();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                Debug.WriteLine(ex.Number + " " + ex.Message);
+                returnCode = ex.Number;
+                throw;
+            }
+            return returnCode;
+        }
 
         /* ************************ PLAYERS-related methods ******************* */
         /* Add new players given scheme name & list of players

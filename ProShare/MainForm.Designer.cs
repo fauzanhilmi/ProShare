@@ -581,7 +581,7 @@
             // ntfConfLabel2
             // 
             this.ntfConfLabel2.AutoSize = true;
-            this.ntfConfLabel2.Location = new System.Drawing.Point(6, 67);
+            this.ntfConfLabel2.Location = new System.Drawing.Point(6, 51);
             this.ntfConfLabel2.Name = "ntfConfLabel2";
             this.ntfConfLabel2.Size = new System.Drawing.Size(35, 13);
             this.ntfConfLabel2.TabIndex = 1;

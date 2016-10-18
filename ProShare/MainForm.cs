@@ -48,7 +48,20 @@ namespace ProShare
         {
             /*              MainForm initializations            */
             //TEST
-            //username = "fauzan";
+            username = "fauzan";
+            try
+            {
+                DatabaseHandler.Connect();
+                DatabaseHandler.IncrementConfirmations("lmao");
+                DatabaseHandler.Close();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                MessageBox.Show("Something went wrong. Please try again.");
+            }
+            /*MQHandler.Connect();
+            MQHandler.Ack(123);
+            MQHandler.Close();*/
             //TEST
 
             this.MaximizeBox = false;
@@ -104,173 +117,6 @@ namespace ProShare
             ntfConfLabel2.Visible = false;
             ntfConfButton1.Visible = false;
             ntfConfButton2.Visible = false;
-        }
-
-        /*          MainForm methods            */
-        private void ProcessNotification(ulong DeliveryTag, IDictionary<string, object> headers, byte[] message)
-        {
-            IDictionary<string, object> contents = new Dictionary<string, object>(headers);
-            contents.Add("Message", message);
-            ntfDictionary.Add(DeliveryTag, contents);
-
-            //changing number of notifications on notificationsButton
-            ulong numOfNotifications = (ulong) notificationsButton.Text[15] - '0'; //change index if the text is changed!
-            Debug.WriteLine(notificationsButton.Text + " : " + numOfNotifications);
-            numOfNotifications++;
-            string newNotificationsText = defaultNotificationsText + numOfNotifications + ")";
-            SetText(notificationsButton, newNotificationsText);
-
-            //adding notification button
-            AddNtfButton(DeliveryTag, contents);
-
-            //TEST
-            Debug.WriteLine(">" + DeliveryTag);
-            foreach(var item in contents)
-            {
-                Debug.WriteLine(item.Key + " : " + Encoding.ASCII.GetString((byte[]) item.Value) + " (" + item.Value.ToString() + ")");
-            }
-            Debug.WriteLine("");
-        }
-
-        private void SetText(Control obj, string text )
-        {
-            //Debug.WriteLine(text);
-            if(obj.InvokeRequired)
-            {
-                SetTextCallback stc = new SetTextCallback(SetText);
-                //this.BeginInvoke(stc, new object[] { obj, text });
-                this.Invoke(stc, new object[] { obj, text });
-            }
-            else
-            {
-                obj.Text = text;
-            }
-        }
-
-        private void AddNtfButton(ulong DeliveryTag, IDictionary<string, object> contents)
-        {
-            //TEST
-            /*foreach (var item in contents)
-            {
-                Debug.WriteLine(item.Key + " : " + Encoding.ASCII.GetString((byte[])item.Value) + " (" + item.Value.ToString() + ")");
-            }
-            Debug.WriteLine("");*/
-
-            Button newButton = new Button();
-            newButton.Tag = DeliveryTag;
-            newButton.Name = "ntfButton" + DeliveryTag;
-            newButton.BackColor = SystemColors.GradientInactiveCaption;
-            newButton.FlatStyle = FlatStyle.Flat;
-            newButton.FlatAppearance.BorderColor = SystemColors.ScrollBar;
-            newButton.Dock = DockStyle.Top;
-            newButton.TextAlign = ContentAlignment.TopLeft;
-
-            //setting the button text
-            string text = "";
-            string type = Encoding.ASCII.GetString((byte[])contents["Type"]);
-            string operation = Encoding.ASCII.GetString((byte[])contents["Operation"]);
-            string scheme = Encoding.ASCII.GetString((byte[])contents["Scheme"]);
-            string sender = Encoding.ASCII.GetString((byte[])contents["Sender"]);
-            if (type == "REQUEST")
-            {
-                switch (operation) 
-                {
-                    case "Generate":
-                        {
-                            text = "(Share Request) " + sender + " invites you to join scheme '" + scheme + "'";
-                            break;
-                        }
-                    case "Reconstruct":
-                        {
-                            //TODO
-                            break;
-                        }
-                    case "Default":
-                        {
-                            //TODO
-                            break;
-                        }
-                    default:
-                        {
-                            Debug.WriteLine("Something went wrong (Operation)");
-                            break;
-                        }
-                }
-            }
-            else if(type == "RESPONSE")
-            {
-                //TODO
-            }
-            else
-            {
-                Debug.WriteLine("Something went wrong (Type)");
-            }
-            newButton.Text = text;
-
-            newButton.Click += NewButton_Click;
-
-            //attach button to ntfPanel
-            if(ntfPanel.InvokeRequired)
-            {
-                AddNtfButtonCallback anc = new AddNtfButtonCallback(AddNtfButton);
-                this.Invoke(anc, new object[] { DeliveryTag, contents});
-            }
-            else
-            {
-                ntfPanel.Controls.Add(newButton);
-            }
-        }
-
-        private void NewButton_Click(object button, EventArgs e)
-        {
-            //MessageBox.Show(((Button)sender).Tag.ToString());
-            ulong DeliveryTag = (ulong) ((Button)button).Tag;
-            string type = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Type"]);
-            string operation = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Operation"]);
-            string scheme = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Scheme"]);
-            string sender = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Sender"]);
-            if (type == "REQUEST")
-            {
-                switch (operation)
-                {
-                    case "Generate":
-                        {
-                            ntfActionStackPanel.SelectTab(0); //Action
-                            ntfConfLabel1.Text = sender + " wants you to join his secret sharing scheme " + scheme + " as a player";
-                            ntfConfLabel1.Visible = true;
-                            ntfConfLabel2.Text = "Click 'Accept' to accept this request. Otherwise, click 'Reject'";
-                            ntfConfLabel2.Visible = true;
-                            ntfConfButton1.Text = "Accept";
-                            ntfConfButton1.Visible = true;
-                            ntfConfButton2.Text = "Reject";
-                            ntfConfButton2.Visible = true;
-                            break;
-                        }
-                    case "Reconstruct":
-                        {
-                            //TODO
-                            break;
-                        }
-                    case "Default":
-                        {
-                            //TODO
-                            break;
-                        }
-                    default:
-                        {
-                            Debug.WriteLine("Something went wrong (Operation)");
-                            break;
-                        }
-                }
-            }
-            else if (type == "RESPONSE")
-            {
-                //TODO
-            }
-            else
-            {
-                Debug.WriteLine("Something went wrong (Type)");
-            }
         }
 
         private void operationsButton_Click(object sender, EventArgs e)
@@ -538,7 +384,7 @@ namespace ProShare
                     {
                         DatabaseHandler.Close(); 
                         DatabaseHandler.Connect(); //reopen SQL connection
-                        int addRes = DatabaseHandler.AddScheme(schemeName, username, k, n); //try to add scheme UNTESTED FOR DEALER!
+                        int addRes = DatabaseHandler.AddScheme(schemeName, username, k, n); //try to add scheme
                         if (addRes == 1) //success
                         {
                             //genStatusLabel.Text = genFirstStatus;
@@ -546,7 +392,6 @@ namespace ProShare
                             genDontCloseLabel.Visible = true;
 
                             DatabaseHandler.AddPlayers(schemeName, players); //add players to db
-
                             //TEST
                             //MQHandler.Connect();
                             /* foreach(string player in players)
@@ -587,6 +432,264 @@ namespace ProShare
                 MessageBox.Show(ex.Message, "Database Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        /*          Notification methods            */
+        private void ProcessNotification(ulong DeliveryTag, IDictionary<string, object> headers, byte[] message)
+        {
+            IDictionary<string, object> contents = new Dictionary<string, object>(headers);
+            contents.Add("Message", message);
+            ntfDictionary.Add(DeliveryTag, contents);
+
+            //changing number of notifications on notificationsButton
+            ulong numOfNotifications = (ulong)notificationsButton.Text[15] - '0'; //change index if the text is changed!
+            Debug.WriteLine(notificationsButton.Text + " : " + numOfNotifications);
+            numOfNotifications++;
+            string newNotificationsText = defaultNotificationsText + numOfNotifications + ")";
+            SetText(notificationsButton, newNotificationsText);
+
+            //adding notification button
+            AddNtfButton(DeliveryTag, contents);
+
+            //TEST
+            /*Debug.WriteLine(">" + DeliveryTag);
+            foreach(var item in contents)
+            {
+                Debug.WriteLine(item.Key + " : " + Encoding.ASCII.GetString((byte[]) item.Value) + " (" + item.Value.ToString() + ")");
+            }
+            Debug.WriteLine("");*/
+        }
+
+        private void SetText(Control obj, string text)
+        {
+            //Debug.WriteLine(text);
+            if (obj.InvokeRequired)
+            {
+                SetTextCallback stc = new SetTextCallback(SetText);
+                //this.BeginInvoke(stc, new object[] { obj, text });
+                this.Invoke(stc, new object[] { obj, text });
+            }
+            else
+            {
+                obj.Text = text;
+            }
+        }
+
+        //GANTI NAMA!
+        private void AddNtfButton(ulong DeliveryTag, IDictionary<string, object> contents)
+        {
+            //TEST
+            /*foreach (var item in contents)
+            {
+                Debug.WriteLine(item.Key + " : " + Encoding.ASCII.GetString((byte[])item.Value) + " (" + item.Value.ToString() + ")");
+            }
+            Debug.WriteLine("");*/
+
+            Button ntfButton = new Button();
+            ntfButton.Tag = DeliveryTag;
+            ntfButton.Name = "ntfButton" + DeliveryTag;
+            ntfButton.BackColor = SystemColors.GradientInactiveCaption;
+            ntfButton.FlatStyle = FlatStyle.Flat;
+            ntfButton.FlatAppearance.BorderColor = SystemColors.ScrollBar;
+            ntfButton.Dock = DockStyle.Top;
+            ntfButton.TextAlign = ContentAlignment.TopLeft;
+
+            //setting the button text
+            string type = Encoding.ASCII.GetString((byte[])contents["Type"]);
+            string operation = Encoding.ASCII.GetString((byte[])contents["Operation"]);
+            string scheme = Encoding.ASCII.GetString((byte[])contents["Scheme"]);
+            string sender = Encoding.ASCII.GetString((byte[])contents["Sender"]);
+            if (type == "REQUEST")
+            {
+                switch (operation)
+                {
+                    case "Generate":
+                        {
+                            ntfButton.Text = "(Share Request) " + sender + " invites you to join scheme '" + scheme + "'";
+                            ntfButton.Click += (o, e) =>
+                            {
+                                ntfActionStackPanel.SelectTab(0); //Action
+                                ntfConfLabel1.Text = sender + " wants you to join his secret sharing scheme '" + scheme + "' as a player.";
+                                ntfConfLabel1.Visible = true;
+                                ntfConfLabel2.Text = "Click 'Accept' to accept this request. Otherwise, click 'Reject'.";
+                                ntfConfLabel2.Visible = true;
+
+                                //ntfConfButton1.Tag = false; //button hasn't been clicked
+                                ntfConfButton1.Text = "Accept";
+                                ntfConfButton1.Visible = true;
+                                ntfConfButton1.Click += (o1, e1) =>
+                                {
+                                    MQHandler.Ack(DeliveryTag);
+                                    MQHandler.SendDirectMessage("RESPONSE", "Generate", scheme, username, sender, BitConverter.GetBytes(true)); //here sender = destination!
+                                    try
+                                    {
+                                        DatabaseHandler.Connect();
+                                        DatabaseHandler.IncrementConfirmations(scheme);
+                                        DatabaseHandler.Close();
+                                    }
+                                    catch (MySql.Data.MySqlClient.MySqlException ex)
+                                    {
+                                        Debug.WriteLine(ex.Number + " : " + ex.Message);
+                                        MessageBox.Show("Something went wrong. Please try again");
+                                    }
+                                    ntfConfLabel2.Text = "You accepted this request.";
+                                    ntfConfButton1.Visible = false;
+                                    ntfConfButton2.Visible = false;
+                                };
+                                //ntfConfButton2.Tag = false; //button hasn't been clicked
+                                ntfConfButton2.Text = "Reject";
+                                ntfConfButton2.Visible = true;
+                                ntfConfButton2.Click += (o2, e2) =>
+                                {
+                                    MQHandler.Ack(DeliveryTag);
+                                    MQHandler.SendDirectMessage("RESPONSE", "Generate", scheme, username, sender, BitConverter.GetBytes(false)); //here sender = destination!
+
+                                    //Delete exchange waktu semua dapet announcement aja
+                                    //DELETE DB JUGA SAMA (biar aman)
+                                    /*try
+                                    {
+                                        DatabaseHandler.Connect();
+                                        DatabaseHandler.DeleteScheme(scheme);
+                                        DatabaseHandler.Close();
+                                    }
+                                    catch (MySql.Data.MySqlClient.MySqlException ex)
+                                    {
+                                        Debug.WriteLine(ex.Number + " : " + ex.Message);
+                                        MessageBox.Show("Something went wrong. Please try again");
+                                    }*/
+                                    ntfConfLabel2.Text = "You rejected this request.";
+                                    ntfConfButton1.Visible = false;
+                                    ntfConfButton2.Visible = false;
+                                };
+                            };
+                            break;
+                        }
+                    case "Reconstruct":
+                        {
+                            //TODO
+                            break;
+                        }
+                    case "Default":
+                        {
+                            //TODO
+                            break;
+                        }
+                    default:
+                        {
+                            Debug.WriteLine("Something went wrong (Operation)");
+                            break;
+                        }
+                }
+            }
+            else if (type == "RESPONSE")
+            {
+                switch(operation)
+                {
+                    case "Generate":
+                        {
+
+                            break;
+                        }
+                    case "Reconstruct":
+                        {
+                            //TODO
+                            break;
+                        }
+                    case "Default":
+                        {
+                            //TODO
+                            break;
+                        }
+                    default:
+                        {
+                            Debug.WriteLine("Something went wrong (Operation)");
+                            break;
+                        }
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Something went wrong (Type)");
+            }
+            //newButton.Text = text;
+
+            //newButton.Click += NewButton_Click;
+
+            //attach button to ntfPanel
+            if (ntfPanel.InvokeRequired)
+            {
+                AddNtfButtonCallback anc = new AddNtfButtonCallback(AddNtfButton);
+                this.Invoke(anc, new object[] { DeliveryTag, contents });
+            }
+            else
+            {
+                ntfPanel.Controls.Add(ntfButton);
+            }
+        }
+
+        /*private void NewButton_Click(object button, EventArgs e)
+        {
+            //MessageBox.Show(((Button)sender).Tag.ToString());
+            ulong DeliveryTag = (ulong)((Button)button).Tag;
+            string type = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Type"]);
+            string operation = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Operation"]);
+            string scheme = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Scheme"]);
+            string sender = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Sender"]);
+            if (type == "REQUEST")
+            {
+                switch (operation)
+                {
+                    case "Generate":
+                        {
+                            ntfActionStackPanel.SelectTab(0); //Action
+                            ntfConfLabel1.Text = sender + " wants you to join his secret sharing scheme '" + scheme + "' as a player.";
+                            ntfConfLabel1.Visible = true;
+                            ntfConfLabel2.Text = "Click 'Accept' to accept this request. Otherwise, click 'Reject'.";
+                            ntfConfLabel2.Visible = true;
+
+                            ntfConfButton1.Tag = DeliveryTag;
+                            ntfConfButton1.Text = "Accept";
+                            ntfConfButton1.Visible = true;
+                            ntfConfButton2.Tag = DeliveryTag;
+                            ntfConfButton2.Text = "Reject";
+                            ntfConfButton2.Visible = true;
+                            break;
+                        }
+                    case "Reconstruct":
+                        {
+                            //TODO
+                            break;
+                        }
+                    case "Default":
+                        {
+                            //TODO
+                            break;
+                        }
+                    default:
+                        {
+                            Debug.WriteLine("Something went wrong (Operation)");
+                            break;
+                        }
+                }
+            }
+            else if (type == "RESPONSE")
+            {
+                //TODO
+            }
+            else
+            {
+                Debug.WriteLine("Something went wrong (Type)");
+            }
+        }
+
+        private void ntfConfButton1_Click(object button, EventArgs e)
+        {
+            ulong DeliveryTag = (ulong)((Button)button).Tag;
+            string type = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Type"]);
+            string operation = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Operation"]);
+            string scheme = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Scheme"]);
+            string sender = Encoding.ASCII.GetString((byte[])ntfDictionary[DeliveryTag]["Sender"]);
+
+        }*/
 
         /*      Other Methods       */
         internal static bool isFileOrDirectoryExists(string name)
