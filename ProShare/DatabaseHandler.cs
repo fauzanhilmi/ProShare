@@ -318,6 +318,42 @@ namespace ProShare
             return returnCode;
         }*/
 
+        public static List<object> GetScheme(string scheme)
+        /* 0 : name
+         * 1 : create_data
+         * 2 : dealer
+         * 3 : k
+         * 4 : n
+         * 5 : num_of_confirmations
+         * */
+        {
+            List<object> results = new List<object>();
+            try
+            {
+                string query = "SELECT * FROM scheme WHERE name ='" + scheme + "'";
+                Debug.WriteLine(query);
+                MySqlCommand cmd = new MySqlCommand(query, SqlConn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //Debug.WriteLine(reader[0] + " " + reader[1] + " " + reader[2]);
+                    //results = reader.Cast<object>().ToList();
+                    results.Add(reader.GetString(0));
+                    results.Add(reader.GetString(1));
+                    results.Add(reader.GetString(2));
+                    results.Add(reader.GetUInt64(3));
+                    results.Add(reader.GetUInt64(4));
+                    results.Add(reader.GetUInt64(5));
+                }
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                Debug.WriteLine(ex.Number + " : " + ex.Message);
+                throw;
+            }
+            return results;
+        }
+
         public static int IncrementConfirmations(string scheme)
         {
             int returnCode = 1;

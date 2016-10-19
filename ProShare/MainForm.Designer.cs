@@ -31,9 +31,9 @@
             this.panel = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.menuGroupBox = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.notificationsButton = new System.Windows.Forms.Button();
             this.operationsButton = new System.Windows.Forms.Button();
-            this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.stackPanel = new ProShare.StackPanel();
             this.Operations = new System.Windows.Forms.TabPage();
             this.operationsTabControl = new System.Windows.Forms.TabControl();
@@ -75,6 +75,7 @@
             this.ntfConfLabel1 = new System.Windows.Forms.Label();
             this.ntfBrowseTabPage = new System.Windows.Forms.TabPage();
             this.Profile = new System.Windows.Forms.TabPage();
+            this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -130,6 +131,7 @@
             // 
             // menuGroupBox
             // 
+            this.menuGroupBox.Controls.Add(this.button1);
             this.menuGroupBox.Controls.Add(this.notificationsButton);
             this.menuGroupBox.Controls.Add(this.operationsButton);
             this.menuGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -142,6 +144,16 @@
             this.menuGroupBox.TabStop = false;
             this.menuGroupBox.Text = "Hello, [USERNAME]!";
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(39, 274);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(87, 26);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // notificationsButton
             // 
             this.notificationsButton.Dock = System.Windows.Forms.DockStyle.Top;
@@ -150,7 +162,7 @@
             this.notificationsButton.Name = "notificationsButton";
             this.notificationsButton.Size = new System.Drawing.Size(201, 46);
             this.notificationsButton.TabIndex = 1;
-            this.notificationsButton.Text = "Notifications (0)";
+            this.notificationsButton.Text = "Notifications";
             this.notificationsButton.UseVisualStyleBackColor = true;
             this.notificationsButton.Click += new System.EventHandler(this.requestsButton_Click);
             // 
@@ -708,5 +720,6 @@
         private System.Windows.Forms.Label ntfConfLabel1;
         private System.Windows.Forms.Button ntfConfButton2;
         private System.Windows.Forms.Button ntfConfButton1;
+        private System.Windows.Forms.Button button1;
     }
 }
