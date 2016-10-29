@@ -74,8 +74,15 @@
             this.ntfConfLabel2 = new System.Windows.Forms.Label();
             this.ntfConfLabel1 = new System.Windows.Forms.Label();
             this.ntfBrowseTabPage = new System.Windows.Forms.TabPage();
+            this.browseGenerateButton = new System.Windows.Forms.Button();
+            this.browseChooseLabel = new System.Windows.Forms.Label();
+            this.browseOrLabel = new System.Windows.Forms.Label();
+            this.browseSecretTextBox = new System.Windows.Forms.TextBox();
+            this.browseSecretFileTextBox = new System.Windows.Forms.TextBox();
+            this.browseBrowseButton = new System.Windows.Forms.Button();
             this.Profile = new System.Windows.Forms.TabPage();
             this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.browseOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -100,6 +107,7 @@
             this.ntfActionGroupBox.SuspendLayout();
             this.ntfActionStackPanel.SuspendLayout();
             this.ntfConfTabPage.SuspendLayout();
+            this.ntfBrowseTabPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel
@@ -593,7 +601,7 @@
             // ntfConfLabel2
             // 
             this.ntfConfLabel2.AutoSize = true;
-            this.ntfConfLabel2.Location = new System.Drawing.Point(6, 51);
+            this.ntfConfLabel2.Location = new System.Drawing.Point(3, 40);
             this.ntfConfLabel2.Name = "ntfConfLabel2";
             this.ntfConfLabel2.Size = new System.Drawing.Size(35, 13);
             this.ntfConfLabel2.TabIndex = 1;
@@ -602,7 +610,7 @@
             // ntfConfLabel1
             // 
             this.ntfConfLabel1.AutoSize = true;
-            this.ntfConfLabel1.Location = new System.Drawing.Point(6, 15);
+            this.ntfConfLabel1.Location = new System.Drawing.Point(3, 3);
             this.ntfConfLabel1.Name = "ntfConfLabel1";
             this.ntfConfLabel1.Size = new System.Drawing.Size(35, 13);
             this.ntfConfLabel1.TabIndex = 0;
@@ -610,6 +618,12 @@
             // 
             // ntfBrowseTabPage
             // 
+            this.ntfBrowseTabPage.Controls.Add(this.browseGenerateButton);
+            this.ntfBrowseTabPage.Controls.Add(this.browseChooseLabel);
+            this.ntfBrowseTabPage.Controls.Add(this.browseOrLabel);
+            this.ntfBrowseTabPage.Controls.Add(this.browseSecretTextBox);
+            this.ntfBrowseTabPage.Controls.Add(this.browseSecretFileTextBox);
+            this.ntfBrowseTabPage.Controls.Add(this.browseBrowseButton);
             this.ntfBrowseTabPage.Location = new System.Drawing.Point(4, 22);
             this.ntfBrowseTabPage.Name = "ntfBrowseTabPage";
             this.ntfBrowseTabPage.Padding = new System.Windows.Forms.Padding(3);
@@ -617,6 +631,59 @@
             this.ntfBrowseTabPage.TabIndex = 1;
             this.ntfBrowseTabPage.Text = "Browse File";
             this.ntfBrowseTabPage.UseVisualStyleBackColor = true;
+            // 
+            // browseGenerateButton
+            // 
+            this.browseGenerateButton.Location = new System.Drawing.Point(296, 152);
+            this.browseGenerateButton.Name = "browseGenerateButton";
+            this.browseGenerateButton.Size = new System.Drawing.Size(154, 37);
+            this.browseGenerateButton.TabIndex = 9;
+            this.browseGenerateButton.Text = "Generate and Send Shares";
+            this.browseGenerateButton.UseVisualStyleBackColor = true;
+            // 
+            // browseChooseLabel
+            // 
+            this.browseChooseLabel.AutoSize = true;
+            this.browseChooseLabel.Location = new System.Drawing.Point(3, 3);
+            this.browseChooseLabel.Name = "browseChooseLabel";
+            this.browseChooseLabel.Size = new System.Drawing.Size(239, 13);
+            this.browseChooseLabel.TabIndex = 8;
+            this.browseChooseLabel.Text = "Please choose a text or file to be made as secret.";
+            // 
+            // browseOrLabel
+            // 
+            this.browseOrLabel.AutoSize = true;
+            this.browseOrLabel.Location = new System.Drawing.Point(224, 101);
+            this.browseOrLabel.Name = "browseOrLabel";
+            this.browseOrLabel.Size = new System.Drawing.Size(16, 13);
+            this.browseOrLabel.TabIndex = 6;
+            this.browseOrLabel.Text = "or";
+            // 
+            // browseSecretTextBox
+            // 
+            this.browseSecretTextBox.Location = new System.Drawing.Point(18, 30);
+            this.browseSecretTextBox.Multiline = true;
+            this.browseSecretTextBox.Name = "browseSecretTextBox";
+            this.browseSecretTextBox.Size = new System.Drawing.Size(432, 68);
+            this.browseSecretTextBox.TabIndex = 4;
+            this.browseSecretTextBox.Text = "Enter a text...";
+            // 
+            // browseSecretFileTextBox
+            // 
+            this.browseSecretFileTextBox.Location = new System.Drawing.Point(18, 117);
+            this.browseSecretFileTextBox.Name = "browseSecretFileTextBox";
+            this.browseSecretFileTextBox.Size = new System.Drawing.Size(342, 20);
+            this.browseSecretFileTextBox.TabIndex = 5;
+            this.browseSecretFileTextBox.Text = "Select a file";
+            // 
+            // browseBrowseButton
+            // 
+            this.browseBrowseButton.Location = new System.Drawing.Point(366, 117);
+            this.browseBrowseButton.Name = "browseBrowseButton";
+            this.browseBrowseButton.Size = new System.Drawing.Size(84, 20);
+            this.browseBrowseButton.TabIndex = 7;
+            this.browseBrowseButton.Text = "Browse...";
+            this.browseBrowseButton.UseVisualStyleBackColor = true;
             // 
             // Profile
             // 
@@ -667,6 +734,8 @@
             this.ntfActionStackPanel.ResumeLayout(false);
             this.ntfConfTabPage.ResumeLayout(false);
             this.ntfConfTabPage.PerformLayout();
+            this.ntfBrowseTabPage.ResumeLayout(false);
+            this.ntfBrowseTabPage.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -721,5 +790,12 @@
         private System.Windows.Forms.Button ntfConfButton2;
         private System.Windows.Forms.Button ntfConfButton1;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button browseGenerateButton;
+        private System.Windows.Forms.Label browseChooseLabel;
+        private System.Windows.Forms.Label browseOrLabel;
+        private System.Windows.Forms.TextBox browseSecretTextBox;
+        private System.Windows.Forms.TextBox browseSecretFileTextBox;
+        private System.Windows.Forms.Button browseBrowseButton;
+        private System.Windows.Forms.OpenFileDialog browseOpenFileDialog;
     }
 }

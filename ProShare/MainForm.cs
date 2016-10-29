@@ -37,6 +37,8 @@ namespace ProShare
 
         /*      Notifications attributes         */
         private int numOfNotifications = 0;
+        private string browseEmptyText = "Enter a text...";
+        private string browseEmptyFile = "Select a file";
         //private string ntftText = "Notifications (";
 
         public MainForm()
@@ -55,20 +57,20 @@ namespace ProShare
             /*              MainForm initializations            */
             MQHandler.Connect();
             //TEST
-            //username = "fauzan";
+            username = "fauzan";
 
-            string sch = "asdf";
-            try
-            {
-                DatabaseHandler.Connect();
-                DatabaseHandler.DeleteScheme(sch);
-                DatabaseHandler.Close();
-            }
-            catch (MySql.Data.MySqlClient.MySqlException ex)
-            {
-                MessageBox.Show("Something went wrong. Please try again.");
-            }
-            MQHandler.DeleteExchange(sch);
+            //string sch = "asdf";
+            //try
+            //{
+            //    DatabaseHandler.Connect();
+            //    DatabaseHandler.DeleteScheme(sch);
+            //    DatabaseHandler.Close();
+            //}
+            //catch (MySql.Data.MySqlClient.MySqlException ex)
+            //{
+            //    MessageBox.Show("Something went wrong. Please try again.");
+            //}
+            //MQHandler.DeleteExchange(sch);
             //TEST
 
             this.MaximizeBox = false;
@@ -125,7 +127,144 @@ namespace ProShare
             ntfConfLabel2.Visible = false;
             ntfConfButton1.Visible = false;
             ntfConfButton2.Visible = false;
+            browseSecretTextBox.Text = browseEmptyText;
+            browseGenerateButton.Enabled = true;
+
+            //Browse
+            //IMPLEMENT!!!
+            browseSecretTextBox.GotFocus += BrowseSecretTextBox_GotFocus;
+            browseSecretTextBox.LostFocus += BrowseSecretTextBox_LostFocus;
+            browseSecretFileTextBox.GotFocus += BrowseSecretFileTextBox_GotFocus;
+            browseSecretFileTextBox.LostFocus += BrowseSecretFileTextBox_LostFocus;
+            browseBrowseButton.Click += BrowseBrowseButton_Click;
+            browseGenerateButton.Click += BrowseGenerateButton_Click;
         }
+
+        //PINDAHIN KE NOTIFICATION
+        private void BrowseSecretTextBox_GotFocus(object sender, EventArgs e)
+        {
+            if (browseSecretTextBox.Text == browseEmptyText)
+            {
+                browseSecretTextBox.Text = "";
+            }
+        }
+
+        //coba 2 method ini!
+        private void BrowseSecretTextBox_LostFocus(object sender, EventArgs e)
+        {
+            if (String.IsNullOrWhiteSpace(browseSecretTextBox.Text) || browseSecretTextBox.Text == browseEmptyText)
+            {
+                browseSecretTextBox.Text = browseEmptyText;
+                //uncomment gak?
+                /*browseBrowseButton.Enabled = false;
+                browseSecretFileTextBox.ReadOnly = false;
+                browseGenerateButton.Enabled = true;*/
+            }
+            else
+            {
+                /*browseBrowseButton.Enabled = true;
+                browseSecretFileTextBox.ReadOnly = true;
+                browseGenerateButton.Enabled = false;*/
+            }
+        }
+
+        private void BrowseSecretFileTextBox_GotFocus(object sender, EventArgs e)
+        {
+            if (browseSecretFileTextBox.Text == browseEmptyFile)
+            {
+                browseSecretFileTextBox.Text = "";
+            }
+        }
+
+        private void BrowseSecretFileTextBox_LostFocus(object sender, EventArgs e)
+        {
+            if (String.IsNullOrWhiteSpace(browseSecretFileTextBox.Text) || browseSecretFileTextBox.Text == browseEmptyFile)
+            {
+                browseSecretFileTextBox.Text = browseEmptyFile;
+
+                //UNCOMMENT GAK?
+                /*browseBrowseButton.Enabled = false;
+                browseSecretTextBox.ReadOnly = false;*/
+            }
+            else
+            {
+                if(File.Exists(browseSecretFileTextBox.Text))
+                {
+                    //UNCOMMENT GAK?
+                    /*browseSecretTextBox.ReadOnly = true;
+                    browseBrowseButton.Enabled = true;*/
+                }
+                else //path is not valid
+                {
+                    MessageBox.Show("Please enter a valid file path", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    browseSecretFileTextBox.Text = browseEmptyFile;
+
+                    /*browseSecretTextBox.ReadOnly = false;
+                    browseBrowseButton.Enabled = false;*/
+                }
+            }
+        }
+
+
+        private void BrowseBrowseButton_Click(object sender, EventArgs e)
+        {
+            DialogResult result = browseOpenFileDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                string fileLocation = browseOpenFileDialog.FileName;
+                browseSecretFileTextBox.Text = fileLocation;
+                //UNCOMMENT?
+                browseSecretTextBox.ReadOnly = true;
+            }
+        }
+
+        
+        private void BrowseGenerateButton_Click(object sender, EventArgs e)
+        {
+            byte[] secretBytes = null;
+            if (browseSecretTextBox.Text != browseEmptyText)
+            {
+                //MessageBox.Show(browseSecretTextBox.Text);
+                secretBytes = ASCIIEncoding.ASCII.GetBytes(browseSecretTextBox.Text);
+                /*string test = ASCIIEncoding.ASCII.GetString(secretBytes);
+                MessageBox.Show(test);*/
+            }
+            else if(browseSecretFileTextBox.Text != browseEmptyFile)
+            {
+                string SLocation = browseSecretFileTextBox.Text;
+                try
+                {
+                    using (FileStream fs = new FileStream(SLocation, FileMode.Open, FileAccess.Read))
+                    {
+                        secretBytes = new byte[fs.Length];
+                        int bytesLeft = (int)fs.Length;
+                        int bytesRead = 0;
+                        while (bytesLeft > 0)
+                        {
+                            int res = fs.Read(secretBytes, bytesRead, bytesLeft);
+                            if (res == 0)
+                                break;
+                            bytesRead += res;
+                            bytesLeft -= res;
+                        }
+
+                        /*using (FileStream fsWrite = new FileStream("test.png", FileMode.Create, FileAccess.Write))
+                        {
+                            fsWrite.Write(secretBytes, 0, secretBytes.Length);
+                        }*/
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+            else
+            {
+                Debug.WriteLine("hayoloh");
+            }
+        }
+        //END OF NANTI PINDAHIN
 
         private void operationsButton_Click(object sender, EventArgs e)
         {
@@ -227,7 +366,8 @@ namespace ProShare
                 //genTextBox.Enabled = true;
                 genTextBox.ReadOnly = false;
             }
-            else if(isFileOrDirectoryExists(genFileTextBox.Text))
+            //else if(isFileOrDirectoryExists(genFileTextBox.Text)) //it isn't working on Notification's "browse"
+            else if(File.Exists(genFileTextBox.Text))
             {
                 //genTextBox.Enabled = false;
                 genTextBox.ReadOnly = true;
@@ -239,7 +379,7 @@ namespace ProShare
             }
         }
 
-        private void browseButton_Click(object sender, EventArgs e)
+        private void browseButton_Click(object sender, EventArgs e) //browseBrowseButton
         {
             DialogResult result = genOpenFileDialog.ShowDialog();
             if(result == DialogResult.OK)
@@ -584,7 +724,6 @@ namespace ProShare
                                 }
                             case "Response": //Only dealer who gets this
                                 {
-                                    //ntfButton.Text = "(Share Request) " + sender + " invites you to join scheme '" + scheme + "'";
                                     bool isAccepted = BitConverter.ToBoolean(message, 0);
                                     string response = "";
                                     if(isAccepted)
@@ -617,7 +756,7 @@ namespace ProShare
                                                 if(num_of_confirmations == n)
                                                 {
                                                     MQHandler.SendFanoutMessages("Generate", "Notice", scheme, username, BitConverter.GetBytes(true));
-                                                    MQHandler.SendDirectMessage("Generate", "Dealer", scheme, "System", username, ASCIIEncoding.ASCII.GetBytes("")); //send special request  to dealer
+                                                    MQHandler.SendDirectMessage("Generate", "Dealer", scheme, "System", username, ASCIIEncoding.ASCII.GetBytes("")); //send special request to dealer
                                                 }
                                                 DatabaseHandler.Close();
                                             }
@@ -655,13 +794,53 @@ namespace ProShare
                                     };
                                     break;
                                 }
-                            case "Notice":
+                            case "Notice": //All players gets this
                                 {
-                                    ntfButton.Text = BitConverter.ToBoolean(message, 0).ToString();
+                                    bool isContinued = BitConverter.ToBoolean(message, 0);
+                                    string bText = "", label1Text = "", label2Text = "";
+                                    if(isContinued)
+                                    {
+                                        bText = "[" + scheme + "] " + " Scheme advances to share distribution";
+                                        label1Text = "Good news, all players have accepted the share requests!";
+                                        label2Text = "Now just wait for the dealer (" + sender + ") to distributes the shares.";
+                                    }
+                                    else
+                                    {
+                                        bText = "[" + scheme + "] " + " Scheme failed to advances to share distribution";
+                                        label1Text = "Bad news, one or more player(s) have rejected the share request.";
+                                        label2Text = "Now the scheme '" + scheme + "'cannot be used and will be deleted.";
+                                    }
+
+                                    ntfButton.Text = bText;
+                                    ntfButton.Click += (o, e) =>
+                                    {
+                                        MQHandler.Ack(DeliveryTag);
+
+                                        ntfActionStackPanel.SelectTab(0); //Action
+                                        ntfConfLabel1.Text = label1Text;
+                                        ntfConfLabel1.Visible = true;
+                                        ntfConfLabel2.Text = label2Text;
+                                        ntfConfLabel2.Visible = true;
+                                        ntfConfButton1.Visible = false;
+                                        ntfConfButton2.Visible = false;
+                                        ntfPanel.Controls.Remove(ntfButton);
+                                        ntfButton.Dispose();
+                                    };
+
                                     break;
                                 }
-                            case "Dealer":
+                            case "Dealer": //Only dealer gets this after all accepted
                                 {
+                                    ntfButton.Text = "[" + scheme + "] Choose secret";
+                                    ntfButton.Click += (o, e) =>
+                                    {
+                                        //MQHandler.Ack(DeliveryTag); Kirim ACK Pas udah generate aja!
+                                        ntfActionStackPanel.SelectTab(1); //Browse page
+
+
+                                        ntfPanel.Controls.Remove(ntfButton);
+                                        ntfButton.Dispose();
+                                    };
                                     break;
                                 }
                         }
@@ -695,17 +874,19 @@ namespace ProShare
         }
 
         /*      Other Methods       */
-        internal static bool isFileOrDirectoryExists(string name)
+        /*internal static bool isFileOrDirectoryExists(string name)
         {
             return (Directory.Exists(name) || File.Exists(name));
-        }
+        }*/
+
+        //private byte[] FiletoBytes
 
         private void button1_Click(object sender, EventArgs e)
         {
             //DecrementNotifications();
             //notificationsButton.Text = "ADLADKJADKKKLAFFA";
             //MQHandler.SendDirectMessage("Generatehehe", "Response", "asdf", username, "arif", BitConverter.GetBytes(true)); //here sender = destination!
-            MQHandler.SendFanoutMessages("Generate", "Notice","asdf", username, BitConverter.GetBytes(false));
+            MQHandler.SendFanoutMessages("Generate", "Dealer","asdf", username, BitConverter.GetBytes(true));
         }
     }
 }

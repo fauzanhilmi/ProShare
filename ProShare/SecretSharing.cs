@@ -43,6 +43,43 @@ namespace ProShare
 
             return shares;
         }
+        
+        //tes!
+        public static byte[][] GenerateByteShares(byte k, byte n, byte[] Secret)
+        {
+            if (k == 0 || n == 0)
+            {
+                throw new System.ArgumentException("k and n cannot be 0", "k and n");
+            }
+            if (k > n)
+            {
+                throw new System.ArgumentException("k must be less or equal than n", "k and n");
+            }
+
+            byte[][] byteShares = new byte[n][];
+            for (byte i = 0; i < n; i++)
+            {
+                byteShares[i] = new byte[Secret.Length + 1];
+            }
+
+            //fill byteShares, array of array of share
+            //byteShares[j][i] = share no. i-1 of player j
+            //byteshares[j][0] is reserved to store the absissca (X value) of player j
+            for (int i = 0; i < Secret.Length; i++)
+            {
+                Share[] CurShares = GenerateShares(k, n, Secret[i]);
+                for (byte j = 0; j < n; j++)
+                {
+                    if (i == 0)
+                    {
+                        byteShares[j][0] = (byte)CurShares[j].GetX();
+                    }
+                    byteShares[j][i + 1] = (byte)CurShares[j].GetY();
+                }
+            }
+
+            return byteShares;
+        }
 
         /* Generates n files as shares (their locations are the return value) with reconstruction threshold = k and secret = S 
          * SLocation is the location to the file that is given as the secret. The file's size must not exceed 2^32 bytes (~4.2 GB) */
