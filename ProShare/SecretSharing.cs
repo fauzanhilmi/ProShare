@@ -144,7 +144,6 @@ namespace ProShare
                             fsWrite.Write(byteShares[i], 0, byteShares[i].Length);
                         }
                     }
-
                 }
             }
             catch (Exception e)
@@ -182,6 +181,46 @@ namespace ProShare
                 S += CurShare;
             }
             return S;
+        }
+
+        public static byte[] ReconstructByteSecret(byte[][] byteShares, byte k)
+        {
+            Share[][] shares = new Share[k][];
+            for(int i=0; i<shares.Length; i++)
+            {
+                byte X = (byte)i; //default value
+                Share[] curShares = new Share[byteShares[i].Length - 1];
+                for(int j=0; j<byteShares[i].Length; j++)
+                {
+                    //getting the x value in front of the file
+                    if (j == 0)
+                    {
+                        X = byteShares[i][j];
+                    }
+                    //convert the rest of file to Share
+                    else
+                    {
+                        curShares[j - 1] = new Share((Field)X, (Field)byteShares[i][j]);
+                    }
+                }
+                shares[i] = curShares;
+            }
+
+            //reconstruction process
+            Field[] Secret = new Field[shares[0].Length];
+            byte[] secretBytes = new byte[Secret.Length];
+            for (int i = 0; i < shares[0].Length; i++)
+            {
+                Share[] CurShares = new Share[k];
+                for (int j = 0; j < k; j++)
+                {
+                    CurShares[j] = shares[j][i];
+                }
+                Secret[i] = ReconstructSecret(CurShares, k);
+                secretBytes[i] = (byte)Secret[i];
+            }
+
+            return secretBytes;
         }
 
         /* Reconstructs secret from first "k" share files from the array of file locations (ShareFilesNames) 

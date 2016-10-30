@@ -39,6 +39,8 @@ namespace ProShare
         private int numOfNotifications = 0;
         private string browseEmptyText = "Enter a text...";
         private string browseEmptyFile = "Select a file";
+        private byte current_k; //for Generate - Dealer
+        private byte current_n;
         //private string ntftText = "Notifications (";
 
         public MainForm()
@@ -248,6 +250,7 @@ namespace ProShare
                             bytesLeft -= res;
                         }
 
+                        //Debug.WriteLine(current_k + " & " + current_n);
                         /*using (FileStream fsWrite = new FileStream("test.png", FileMode.Create, FileAccess.Write))
                         {
                             fsWrite.Write(secretBytes, 0, secretBytes.Length);
@@ -259,9 +262,49 @@ namespace ProShare
                     Console.WriteLine(ex.ToString());
                 }
             }
+            //else hayoloh
+
+            if(secretBytes == null)
+            {
+                Debug.WriteLine("HAYOLOH NULL");
+            }
             else
             {
-                Debug.WriteLine("hayoloh");
+                //Debug.WriteLine(current_k + " & " + current_n);
+                //TES
+                byte[][] byteMatrix = SecretSharing.GenerateByteShares(current_k, current_n, secretBytes);
+
+                byte[] testBytes = SecretSharing.ReconstructByteSecret(byteMatrix, current_k); //tested, pasti berhasil
+                
+
+                Debug.Assert(secretBytes.Length == testBytes.Length, "panjang beda");
+                for(int i=0; i<testBytes.Length; i++)
+                {
+                    if(testBytes[i] != secretBytes[i])
+                    {
+                        Debug.WriteLine("isi beda di " + i);
+                        break;
+                    }
+                    //Debug.Assert(testBytes[i] == secretBytes[i], "isi beda di " + i);
+                }
+                Debug.WriteLine("Finish");
+                SaveBytestoFile(testBytes, "test.txt");
+            }
+
+        }
+
+        private void SaveBytestoFile(byte[] bytes, string FLocation)
+        {
+            try
+            {
+                using (FileStream fsWrite = new FileStream(FLocation, FileMode.Create, FileAccess.Write))
+                {
+                    fsWrite.Write(bytes, 0, bytes.Length);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString());
             }
         }
         //END OF NANTI PINDAHIN
@@ -837,9 +880,27 @@ namespace ProShare
                                         //MQHandler.Ack(DeliveryTag); Kirim ACK Pas udah generate aja!
                                         ntfActionStackPanel.SelectTab(1); //Browse page
 
+                                        browseSecretTextBox.Enabled = true;
+                                        browseSecretFileTextBox.Enabled = true;
+                                        browseBrowseButton.Enabled = true;
+                                        browseGenerateButton.Enabled = true;
+                                        try
+                                        {
+                                            DatabaseHandler.Connect();
+                                            string schemeName = ASCIIEncoding.UTF8.GetString(((byte[])ntfDictionary[DeliveryTag]["Scheme"]));
+                                            List<object> schemeInfos = DatabaseHandler.GetScheme(schemeName);
+                                            current_k = (byte) (ulong)schemeInfos[3];
+                                            current_n = (byte) (ulong)schemeInfos[4];
 
-                                        ntfPanel.Controls.Remove(ntfButton);
-                                        ntfButton.Dispose();
+                                            DatabaseHandler.Close();
+
+                                            ntfPanel.Controls.Remove(ntfButton);
+                                            ntfButton.Dispose();
+                                        }
+                                        catch (MySql.Data.MySqlClient.MySqlException ex)
+                                        {
+                                            Debug.WriteLine(ex.Number + " : " + ex.Message);
+                                        }
                                     };
                                     break;
                                 }
