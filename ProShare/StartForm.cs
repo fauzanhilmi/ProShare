@@ -174,6 +174,7 @@ namespace ProShare
                             MQHandler.Close();
 
                             //Form transition
+                            MessageBox.Show("Welcome to Proshare, " + username + "!", "Registration Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             this.Hide();
                             MainForm mf = new MainForm(username);
                             this.Owner = mf;
@@ -181,7 +182,7 @@ namespace ProShare
                         }
                         else if(result == 0)
                         {
-                            MessageBox.Show("This computer is already registered. Please login with appropiate account.", "Register Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBox.Show("This computer is already registered. Please login with appropiate account.", "Registration Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
                         //else catch exception
                     }

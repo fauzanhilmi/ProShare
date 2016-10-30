@@ -31,6 +31,7 @@
             this.panel = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.menuGroupBox = new System.Windows.Forms.GroupBox();
+            this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.notificationsButton = new System.Windows.Forms.Button();
             this.operationsButton = new System.Windows.Forms.Button();
@@ -83,6 +84,9 @@
             this.Profile = new System.Windows.Forms.TabPage();
             this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.browseOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.ntfSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.cekOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.cekSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -139,6 +143,7 @@
             // 
             // menuGroupBox
             // 
+            this.menuGroupBox.Controls.Add(this.button2);
             this.menuGroupBox.Controls.Add(this.button1);
             this.menuGroupBox.Controls.Add(this.notificationsButton);
             this.menuGroupBox.Controls.Add(this.operationsButton);
@@ -152,9 +157,19 @@
             this.menuGroupBox.TabStop = false;
             this.menuGroupBox.Text = "Hello, [USERNAME]!";
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(28, 395);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(103, 30);
+            this.button2.TabIndex = 3;
+            this.button2.Text = "Cek Share";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(39, 274);
+            this.button1.Location = new System.Drawing.Point(28, 431);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(87, 26);
             this.button1.TabIndex = 2;
@@ -695,6 +710,15 @@
             this.Profile.TabIndex = 1;
             this.Profile.Text = "Profile";
             // 
+            // ntfSaveFileDialog
+            // 
+            this.ntfSaveFileDialog.DefaultExt = "share";
+            this.ntfSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.ntfSaveFileDialog_FileOk);
+            // 
+            // cekOpenFileDialog
+            // 
+            this.cekOpenFileDialog.FileName = "cekOpenFileDialog";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -797,5 +821,9 @@
         private System.Windows.Forms.TextBox browseSecretFileTextBox;
         private System.Windows.Forms.Button browseBrowseButton;
         private System.Windows.Forms.OpenFileDialog browseOpenFileDialog;
+        private System.Windows.Forms.SaveFileDialog ntfSaveFileDialog;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.OpenFileDialog cekOpenFileDialog;
+        private System.Windows.Forms.SaveFileDialog cekSaveFileDialog;
     }
 }

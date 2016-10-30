@@ -39,8 +39,10 @@ namespace ProShare
         private int numOfNotifications = 0;
         private string browseEmptyText = "Enter a text...";
         private string browseEmptyFile = "Select a file";
-        private byte current_k; //for Generate - Dealer
-        private byte current_n;
+        private string current_scheme;
+        private byte[] current_bytes;
+        //private byte current_k; //for Generate - Dealer
+        //private byte current_n;
         //private string ntftText = "Notifications (";
 
         public MainForm()
@@ -59,20 +61,20 @@ namespace ProShare
             /*              MainForm initializations            */
             MQHandler.Connect();
             //TEST
-            username = "fauzan";
+            //username = "fauzan";
 
-            //string sch = "asdf";
-            //try
-            //{
-            //    DatabaseHandler.Connect();
-            //    DatabaseHandler.DeleteScheme(sch);
-            //    DatabaseHandler.Close();
-            //}
-            //catch (MySql.Data.MySqlClient.MySqlException ex)
-            //{
-            //    MessageBox.Show("Something went wrong. Please try again.");
-            //}
-            //MQHandler.DeleteExchange(sch);
+            string sch = "ABDText";
+            try
+            {
+                DatabaseHandler.Connect();
+                DatabaseHandler.DeleteScheme(sch);
+                DatabaseHandler.Close();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                MessageBox.Show("Something went wrong. Please try again.");
+            }
+            MQHandler.DeleteExchange(sch);
             //TEST
 
             this.MaximizeBox = false;
@@ -270,25 +272,36 @@ namespace ProShare
             }
             else
             {
-                //Debug.WriteLine(current_k + " & " + current_n);
-                //TES
-                byte[][] byteMatrix = SecretSharing.GenerateByteShares(current_k, current_n, secretBytes);
-
-                byte[] testBytes = SecretSharing.ReconstructByteSecret(byteMatrix, current_k); //tested, pasti berhasil
-                
-
-                Debug.Assert(secretBytes.Length == testBytes.Length, "panjang beda");
-                for(int i=0; i<testBytes.Length; i++)
+                try
                 {
-                    if(testBytes[i] != secretBytes[i])
+                    DatabaseHandler.Connect();
+                    List<object> schemeInfos = DatabaseHandler.GetScheme(current_scheme);
+                    byte k = (byte)(ulong)schemeInfos[3];
+                    byte n = (byte)(ulong)schemeInfos[4];
+                    DatabaseHandler.Close();
+                    //Debug.WriteLine(k + " & " + n);
+                    byte[][] byteMatrix = SecretSharing.GenerateByteShares(k, n, secretBytes);
+
+                    DatabaseHandler.Connect();
+                    List<string> players = DatabaseHandler.GetPlayers(current_scheme);
+
+                    byte idx = 0;
+                    foreach(string player in players)
                     {
-                        Debug.WriteLine("isi beda di " + i);
-                        break;
+                        MQHandler.SendDirectMessage("Generate", "Share", current_scheme, username, player, byteMatrix[idx]);
+                        idx++;
                     }
-                    //Debug.Assert(testBytes[i] == secretBytes[i], "isi beda di " + i);
+                    //disini
+                    //on track to send bytematrix to players
+
+                    //TES
+                    //byte[] testBytes = SecretSharing.ReconstructByteSecret(byteMatrix, current_k); //tested, pasti berhasil
+                    DatabaseHandler.Close();
                 }
-                Debug.WriteLine("Finish");
-                SaveBytestoFile(testBytes, "test.txt");
+                catch (MySql.Data.MySqlClient.MySqlException ex)
+                {
+                    Debug.WriteLine(ex.Number + " : " + ex.Message);
+                }
             }
 
         }
@@ -699,6 +712,7 @@ namespace ProShare
             string operation = Encoding.ASCII.GetString((byte[])contents["Operation"]);
             string type = Encoding.ASCII.GetString((byte[])contents["Type"]);
             string scheme = Encoding.ASCII.GetString((byte[])contents["Scheme"]);
+            current_scheme = scheme;
             string sender = Encoding.ASCII.GetString((byte[])contents["Sender"]);
             byte[] message = (byte[])contents["Message"];
 
@@ -887,11 +901,7 @@ namespace ProShare
                                         try
                                         {
                                             DatabaseHandler.Connect();
-                                            string schemeName = ASCIIEncoding.UTF8.GetString(((byte[])ntfDictionary[DeliveryTag]["Scheme"]));
-                                            List<object> schemeInfos = DatabaseHandler.GetScheme(schemeName);
-                                            current_k = (byte) (ulong)schemeInfos[3];
-                                            current_n = (byte) (ulong)schemeInfos[4];
-
+                                            current_scheme = ASCIIEncoding.UTF8.GetString(((byte[])ntfDictionary[DeliveryTag]["Scheme"]));
                                             DatabaseHandler.Close();
 
                                             ntfPanel.Controls.Remove(ntfButton);
@@ -901,6 +911,40 @@ namespace ProShare
                                         {
                                             Debug.WriteLine(ex.Number + " : " + ex.Message);
                                         }
+                                    };
+                                    break;
+                                }
+                            case "Share":
+                                {
+                                    ntfButton.Text = "[" + scheme + "] You get a share from " + sender;
+                                    ntfButton.Click += (o, e) =>
+                                    {
+                                        ntfActionStackPanel.SelectTab(0); //Action
+                                        ntfConfLabel1.Text = sender + " has sent a share for you to save.";
+                                        ntfConfLabel1.Visible = true;
+                                        ntfConfLabel2.Text = "Click 'Save' to save the share to your local disk.";
+                                        ntfConfLabel2.Visible = true;
+                                        ntfConfButton1.Visible = false;
+                                        ntfConfButton2.Text = "Save";
+                                        ntfConfButton2.Visible = true;
+                                        ntfConfButton2.Click += (o2, e2) =>
+                                        {
+                                            current_bytes = message;
+                                            ntfSaveFileDialog.DefaultExt = "share";
+                                            ntfSaveFileDialog.Filter = "Share document (*.share)|*.share";
+                                            ntfSaveFileDialog.AddExtension = true;
+                                            ntfSaveFileDialog.FileOk += (o3, e3) =>
+                                            {
+                                                string filename = ntfSaveFileDialog.FileName;
+                                                File.WriteAllBytes(filename, current_bytes);
+                                            };
+                                            ntfSaveFileDialog.ShowDialog();
+
+                                            ntfConfLabel2.Text = "You have saved the share.";
+                                            ntfConfButton2.Visible = false;
+                                            ntfPanel.Controls.Remove(ntfButton);
+                                            ntfButton.Dispose();
+                                        };
                                     };
                                     break;
                                 }
@@ -948,6 +992,38 @@ namespace ProShare
             //notificationsButton.Text = "ADLADKJADKKKLAFFA";
             //MQHandler.SendDirectMessage("Generatehehe", "Response", "asdf", username, "arif", BitConverter.GetBytes(true)); //here sender = destination!
             MQHandler.SendFanoutMessages("Generate", "Dealer","asdf", username, BitConverter.GetBytes(true));
+        }
+
+        /*private void ntfSaveFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+            string filename = ntfSaveFileDialog.FileName;
+            File.WriteAllBytes(filename, current_bytes);
+        }*/
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            cekOpenFileDialog.Multiselect = true;
+            DialogResult result = cekOpenFileDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                string[] shareFiles = cekOpenFileDialog.FileNames;
+                cekSaveFileDialog.ShowDialog();
+                string filename = cekSaveFileDialog.FileName;
+                try
+                {
+                    DatabaseHandler.Connect();
+                    List<object> schemeInfos = DatabaseHandler.GetScheme(current_scheme);
+                    byte k = (byte)(ulong)schemeInfos[3];
+                    byte n = (byte)(ulong)schemeInfos[4];
+                    Debug.WriteLine(k + " & " + n);
+                    SecretSharing.ReconstructFileSecret(shareFiles, k, filename);
+                    //File.WriteAllBytes(filename, current_bytes);
+                }
+                catch (MySql.Data.MySqlClient.MySqlException ex)
+                {
+                    Debug.WriteLine(ex.Number + " " + ex.Message);
+                }
+            }
         }
     }
 }
