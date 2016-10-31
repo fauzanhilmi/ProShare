@@ -39,11 +39,13 @@ namespace ProShare
         private int numOfNotifications = 0;
         private string browseEmptyText = "Enter a text...";
         private string browseEmptyFile = "Select a file";
-        private string current_scheme;
-        private byte[] current_bytes;
+        //private byte[] current_bytes;
         //private byte current_k; //for Generate - Dealer
         //private byte current_n;
         //private string ntftText = "Notifications (";
+
+        /*      TEST attributes                  */
+        //private string current_scheme;
 
         public MainForm()
         {
@@ -63,18 +65,18 @@ namespace ProShare
             //TEST
             //username = "fauzan";
 
-            string sch = "ABDText";
-            try
-            {
-                DatabaseHandler.Connect();
-                DatabaseHandler.DeleteScheme(sch);
-                DatabaseHandler.Close();
-            }
-            catch (MySql.Data.MySqlClient.MySqlException ex)
-            {
-                MessageBox.Show("Something went wrong. Please try again.");
-            }
-            MQHandler.DeleteExchange(sch);
+            //string sch = "BODO";
+            //try
+            //{
+            //    DatabaseHandler.Connect();
+            //    DatabaseHandler.DeleteScheme(sch);
+            //    DatabaseHandler.Close();
+            //}
+            //catch (MySql.Data.MySqlClient.MySqlException ex)
+            //{
+            //    MessageBox.Show("Something went wrong. Please try again.");
+            //}
+            //MQHandler.DeleteExchange(sch);
             //TEST
 
             this.MaximizeBox = false;
@@ -136,16 +138,16 @@ namespace ProShare
 
             //Browse
             //IMPLEMENT!!!
-            browseSecretTextBox.GotFocus += BrowseSecretTextBox_GotFocus;
-            browseSecretTextBox.LostFocus += BrowseSecretTextBox_LostFocus;
-            browseSecretFileTextBox.GotFocus += BrowseSecretFileTextBox_GotFocus;
-            browseSecretFileTextBox.LostFocus += BrowseSecretFileTextBox_LostFocus;
-            browseBrowseButton.Click += BrowseBrowseButton_Click;
-            browseGenerateButton.Click += BrowseGenerateButton_Click;
+            //browseSecretTextBox.GotFocus += BrowseSecretTextBox_GotFocus;
+            //browseSecretTextBox.LostFocus += BrowseSecretTextBox_LostFocus;
+            //browseSecretFileTextBox.GotFocus += BrowseSecretFileTextBox_GotFocus;
+            //browseSecretFileTextBox.LostFocus += BrowseSecretFileTextBox_LostFocus;
+            //browseBrowseButton.Click += BrowseBrowseButton_Click;
+            //browseGenerateButton.Click += BrowseGenerateButton_Click;
         }
 
         //PINDAHIN KE NOTIFICATION
-        private void BrowseSecretTextBox_GotFocus(object sender, EventArgs e)
+        /*private void BrowseSecretTextBox_GotFocus(object sender, EventArgs e)
         {
             if (browseSecretTextBox.Text == browseEmptyText)
             {
@@ -160,15 +162,15 @@ namespace ProShare
             {
                 browseSecretTextBox.Text = browseEmptyText;
                 //uncomment gak?
-                /*browseBrowseButton.Enabled = false;
-                browseSecretFileTextBox.ReadOnly = false;
-                browseGenerateButton.Enabled = true;*/
+                //browseBrowseButton.Enabled = false;
+                //browseSecretFileTextBox.ReadOnly = false;
+                //browseGenerateButton.Enabled = true;
             }
             else
             {
-                /*browseBrowseButton.Enabled = true;
-                browseSecretFileTextBox.ReadOnly = true;
-                browseGenerateButton.Enabled = false;*/
+                //browseBrowseButton.Enabled = true;
+                //browseSecretFileTextBox.ReadOnly = true;
+                //browseGenerateButton.Enabled = false;
             }
         }
 
@@ -187,28 +189,27 @@ namespace ProShare
                 browseSecretFileTextBox.Text = browseEmptyFile;
 
                 //UNCOMMENT GAK?
-                /*browseBrowseButton.Enabled = false;
-                browseSecretTextBox.ReadOnly = false;*/
+                //browseBrowseButton.Enabled = false;
+                //browseSecretTextBox.ReadOnly = false;
             }
             else
             {
                 if(File.Exists(browseSecretFileTextBox.Text))
                 {
                     //UNCOMMENT GAK?
-                    /*browseSecretTextBox.ReadOnly = true;
-                    browseBrowseButton.Enabled = true;*/
+                    //browseSecretTextBox.ReadOnly = true;
+                    //browseBrowseButton.Enabled = true;
                 }
                 else //path is not valid
                 {
                     MessageBox.Show("Please enter a valid file path", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     browseSecretFileTextBox.Text = browseEmptyFile;
 
-                    /*browseSecretTextBox.ReadOnly = false;
-                    browseBrowseButton.Enabled = false;*/
+                    //browseSecretTextBox.ReadOnly = false;
+                    //browseBrowseButton.Enabled = false;
                 }
             }
         }
-
 
         private void BrowseBrowseButton_Click(object sender, EventArgs e)
         {
@@ -221,7 +222,6 @@ namespace ProShare
                 browseSecretTextBox.ReadOnly = true;
             }
         }
-
         
         private void BrowseGenerateButton_Click(object sender, EventArgs e)
         {
@@ -230,8 +230,8 @@ namespace ProShare
             {
                 //MessageBox.Show(browseSecretTextBox.Text);
                 secretBytes = ASCIIEncoding.ASCII.GetBytes(browseSecretTextBox.Text);
-                /*string test = ASCIIEncoding.ASCII.GetString(secretBytes);
-                MessageBox.Show(test);*/
+                //string test = ASCIIEncoding.ASCII.GetString(secretBytes);
+                //MessageBox.Show(test);
             }
             else if(browseSecretFileTextBox.Text != browseEmptyFile)
             {
@@ -253,10 +253,10 @@ namespace ProShare
                         }
 
                         //Debug.WriteLine(current_k + " & " + current_n);
-                        /*using (FileStream fsWrite = new FileStream("test.png", FileMode.Create, FileAccess.Write))
-                        {
-                            fsWrite.Write(secretBytes, 0, secretBytes.Length);
-                        }*/
+                        //using (FileStream fsWrite = new FileStream("test.png", FileMode.Create, FileAccess.Write))
+                        //{
+                        //    fsWrite.Write(secretBytes, 0, secretBytes.Length);
+                        //}
                     }
                 }
                 catch (Exception ex)
@@ -304,9 +304,9 @@ namespace ProShare
                 }
             }
 
-        }
+        }*/
 
-        private void SaveBytestoFile(byte[] bytes, string FLocation)
+        /*private void SaveBytestoFile(byte[] bytes, string FLocation)
         {
             try
             {
@@ -319,7 +319,7 @@ namespace ProShare
             {
                 Debug.WriteLine(e.ToString());
             }
-        }
+        }*/
         //END OF NANTI PINDAHIN
 
         private void operationsButton_Click(object sender, EventArgs e)
@@ -712,7 +712,7 @@ namespace ProShare
             string operation = Encoding.ASCII.GetString((byte[])contents["Operation"]);
             string type = Encoding.ASCII.GetString((byte[])contents["Type"]);
             string scheme = Encoding.ASCII.GetString((byte[])contents["Scheme"]);
-            current_scheme = scheme;
+            //current_scheme = scheme;
             string sender = Encoding.ASCII.GetString((byte[])contents["Sender"]);
             byte[] message = (byte[])contents["Message"];
 
@@ -894,23 +894,166 @@ namespace ProShare
                                         //MQHandler.Ack(DeliveryTag); Kirim ACK Pas udah generate aja!
                                         ntfActionStackPanel.SelectTab(1); //Browse page
 
-                                        browseSecretTextBox.Enabled = true;
-                                        browseSecretFileTextBox.Enabled = true;
-                                        browseBrowseButton.Enabled = true;
-                                        browseGenerateButton.Enabled = true;
-                                        try
+                                        browseSecretTextBox.Visible = true;
+                                        browseSecretTextBox.GotFocus += (o2, e2) =>
                                         {
-                                            DatabaseHandler.Connect();
-                                            current_scheme = ASCIIEncoding.UTF8.GetString(((byte[])ntfDictionary[DeliveryTag]["Scheme"]));
-                                            DatabaseHandler.Close();
+                                            if (browseSecretTextBox.Text == browseEmptyText)
+                                            {
+                                                browseSecretTextBox.Text = "";
+                                            }
+                                        };
+                                        browseSecretTextBox.LostFocus += (o2, e2) =>
+                                        {
+                                            if (String.IsNullOrWhiteSpace(browseSecretTextBox.Text) || browseSecretTextBox.Text == browseEmptyText)
+                                            {
+                                                browseSecretTextBox.Text = browseEmptyText;
+                                                //uncomment gak?
+                                                //browseBrowseButton.Enabled = false;
+                                                //browseSecretFileTextBox.ReadOnly = false;
+                                                //browseGenerateButton.Enabled = true;
+                                            }
+                                            else
+                                            {
+                                                //browseBrowseButton.Enabled = true;
+                                                //browseSecretFileTextBox.ReadOnly = true;
+                                                //browseGenerateButton.Enabled = false;
+                                            }
+                                        };
+                                        browseSecretFileTextBox.Visible = true;
+                                        browseSecretFileTextBox.GotFocus += (o2, e2) =>
+                                        {
+                                            if (browseSecretFileTextBox.Text == browseEmptyFile)
+                                            {
+                                                browseSecretFileTextBox.Text = "";
+                                            }
+                                        };
+                                        browseSecretFileTextBox.LostFocus += (o2, e2) =>
+                                        {
+                                            if (String.IsNullOrWhiteSpace(browseSecretFileTextBox.Text) || browseSecretFileTextBox.Text == browseEmptyFile)
+                                            {
+                                                browseSecretFileTextBox.Text = browseEmptyFile;
 
-                                            ntfPanel.Controls.Remove(ntfButton);
-                                            ntfButton.Dispose();
-                                        }
-                                        catch (MySql.Data.MySqlClient.MySqlException ex)
+                                                //UNCOMMENT GAK?
+                                                /*browseBrowseButton.Enabled = false;
+                                                browseSecretTextBox.ReadOnly = false;*/
+                                            }
+                                            else
+                                            {
+                                                if (File.Exists(browseSecretFileTextBox.Text))
+                                                {
+                                                    //UNCOMMENT GAK?
+                                                    /*browseSecretTextBox.ReadOnly = true;
+                                                    browseBrowseButton.Enabled = true;*/
+                                                }
+                                                else //path is not valid
+                                                {
+                                                    MessageBox.Show("Please enter a valid file path", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                                    browseSecretFileTextBox.Text = browseEmptyFile;
+
+                                                    /*browseSecretTextBox.ReadOnly = false;
+                                                    browseBrowseButton.Enabled = false;*/
+                                                }
+                                            }
+                                        };
+                                        browseBrowseButton.Visible = true;
+                                        browseBrowseButton.Click += (o2, e2) =>
                                         {
-                                            Debug.WriteLine(ex.Number + " : " + ex.Message);
-                                        }
+                                            DialogResult result = browseOpenFileDialog.ShowDialog();
+                                            if (result == DialogResult.OK)
+                                            {
+                                                string fileLocation = browseOpenFileDialog.FileName;
+                                                browseSecretFileTextBox.Text = fileLocation;
+                                                //UNCOMMENT?
+                                                browseSecretTextBox.ReadOnly = true;
+                                            }
+                                            //else Debug.WriteLine("cancel");
+                                        };
+                                        browseGenerateButton.Visible = true;
+                                        browseGenerateButton.Click += (o2, e2) =>
+                                        {
+                                            byte[] secretBytes = null;
+                                            if (browseSecretTextBox.Text != browseEmptyText)
+                                            {
+                                                //MessageBox.Show(browseSecretTextBox.Text);
+                                                secretBytes = ASCIIEncoding.ASCII.GetBytes(browseSecretTextBox.Text);
+                                                /*string test = ASCIIEncoding.ASCII.GetString(secretBytes);
+                                                MessageBox.Show(test);*/
+                                            }
+                                            else if (browseSecretFileTextBox.Text != browseEmptyFile)
+                                            {
+                                                string SLocation = browseSecretFileTextBox.Text;
+                                                try
+                                                {
+                                                    using (FileStream fs = new FileStream(SLocation, FileMode.Open, FileAccess.Read))
+                                                    {
+                                                        secretBytes = new byte[fs.Length];
+                                                        int bytesLeft = (int)fs.Length;
+                                                        int bytesRead = 0;
+                                                        while (bytesLeft > 0)
+                                                        {
+                                                            int res = fs.Read(secretBytes, bytesRead, bytesLeft);
+                                                            if (res == 0)
+                                                                break;
+                                                            bytesRead += res;
+                                                            bytesLeft -= res;
+                                                        }
+
+                                                        //Debug.WriteLine(current_k + " & " + current_n);
+                                                        /*using (FileStream fsWrite = new FileStream("test.png", FileMode.Create, FileAccess.Write))
+                                                        {
+                                                            fsWrite.Write(secretBytes, 0, secretBytes.Length);
+                                                        }*/
+                                                    }
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Console.WriteLine(ex.ToString());
+                                                }
+                                            }
+                                            //else hayoloh
+
+                                            if (secretBytes == null)
+                                            {
+                                                Debug.WriteLine("HAYOLOH NULL");
+                                            }
+                                            else
+                                            {
+                                                try
+                                                {
+                                                    DatabaseHandler.Connect();
+                                                    List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                                                    byte k = (byte)(ulong)schemeInfos[3];
+                                                    byte n = (byte)(ulong)schemeInfos[4];
+                                                    DatabaseHandler.Close();
+                                                    //Debug.WriteLine(k + " & " + n);
+                                                    byte[][] byteMatrix = SecretSharing.GenerateByteShares(k, n, secretBytes);
+
+                                                    DatabaseHandler.Connect();
+                                                    List<string> players = DatabaseHandler.GetPlayers(scheme);
+
+                                                    byte idx = 0;
+                                                    foreach (string player in players)
+                                                    {
+                                                        MQHandler.SendDirectMessage("Generate", "Share", scheme, username, player, byteMatrix[idx]);
+                                                        idx++;
+                                                    }
+
+                                                    //TES
+                                                    //byte[] testBytes = SecretSharing.ReconstructByteSecret(byteMatrix, current_k); //tested, pasti berhasil
+                                                    MessageBox.Show("The shares have been sent to all players", "Shares Delivery Completd", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                    MQHandler.Ack(DeliveryTag);
+                                                    DatabaseHandler.Close();
+
+                                                    browseGenerateButton.Visible = false;
+                                                    ntfPanel.Controls.Remove(ntfButton);
+                                                    ntfButton.Dispose();
+                                                }
+                                                catch (MySql.Data.MySqlClient.MySqlException ex)
+                                                {
+                                                    Debug.WriteLine(ex.Number + " : " + ex.Message);
+                                                }
+                                            }
+                                        };
                                     };
                                     break;
                                 }
@@ -927,21 +1070,23 @@ namespace ProShare
                                         ntfConfButton1.Visible = false;
                                         ntfConfButton2.Text = "Save";
                                         ntfConfButton2.Visible = true;
-                                        ntfConfButton2.Click += (o2, e2) =>
+                                        ntfConfButton2.Click += (o1, e1) =>
                                         {
-                                            current_bytes = message;
+                                            //current_bytes = message;
                                             ntfSaveFileDialog.DefaultExt = "share";
                                             ntfSaveFileDialog.Filter = "Share document (*.share)|*.share";
                                             ntfSaveFileDialog.AddExtension = true;
                                             ntfSaveFileDialog.FileOk += (o3, e3) =>
                                             {
                                                 string filename = ntfSaveFileDialog.FileName;
-                                                File.WriteAllBytes(filename, current_bytes);
+                                                File.WriteAllBytes(filename, message);
                                             };
                                             ntfSaveFileDialog.ShowDialog();
 
                                             ntfConfLabel2.Text = "You have saved the share.";
                                             ntfConfButton2.Visible = false;
+
+                                            MQHandler.Ack(DeliveryTag);
                                             ntfPanel.Controls.Remove(ntfButton);
                                             ntfButton.Dispose();
                                         };
@@ -994,14 +1139,15 @@ namespace ProShare
             MQHandler.SendFanoutMessages("Generate", "Dealer","asdf", username, BitConverter.GetBytes(true));
         }
 
-        /*private void ntfSaveFileDialog_FileOk(object sender, CancelEventArgs e)
+        private void ntfSaveFileDialog_FileOk(object sender, CancelEventArgs e)
         {
-            string filename = ntfSaveFileDialog.FileName;
-            File.WriteAllBytes(filename, current_bytes);
-        }*/
+            //string filename = ntfSaveFileDialog.FileName;
+            //File.WriteAllBytes(filename, current_bytes);
+        }
 
         private void button2_Click(object sender, EventArgs e)
         {
+            string scheme = cekShareTextBox.Text;
             cekOpenFileDialog.Multiselect = true;
             DialogResult result = cekOpenFileDialog.ShowDialog();
             if (result == DialogResult.OK)
@@ -1012,7 +1158,7 @@ namespace ProShare
                 try
                 {
                     DatabaseHandler.Connect();
-                    List<object> schemeInfos = DatabaseHandler.GetScheme(current_scheme);
+                    List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
                     byte k = (byte)(ulong)schemeInfos[3];
                     byte n = (byte)(ulong)schemeInfos[4];
                     Debug.WriteLine(k + " & " + n);

@@ -31,7 +31,8 @@
             this.panel = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.menuGroupBox = new System.Windows.Forms.GroupBox();
-            this.button2 = new System.Windows.Forms.Button();
+            this.cekShareTextBox = new System.Windows.Forms.TextBox();
+            this.cekShareButton = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.notificationsButton = new System.Windows.Forms.Button();
             this.operationsButton = new System.Windows.Forms.Button();
@@ -143,7 +144,8 @@
             // 
             // menuGroupBox
             // 
-            this.menuGroupBox.Controls.Add(this.button2);
+            this.menuGroupBox.Controls.Add(this.cekShareTextBox);
+            this.menuGroupBox.Controls.Add(this.cekShareButton);
             this.menuGroupBox.Controls.Add(this.button1);
             this.menuGroupBox.Controls.Add(this.notificationsButton);
             this.menuGroupBox.Controls.Add(this.operationsButton);
@@ -157,19 +159,26 @@
             this.menuGroupBox.TabStop = false;
             this.menuGroupBox.Text = "Hello, [USERNAME]!";
             // 
-            // button2
+            // cekShareTextBox
             // 
-            this.button2.Location = new System.Drawing.Point(28, 395);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(103, 30);
-            this.button2.TabIndex = 3;
-            this.button2.Text = "Cek Share";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.cekShareTextBox.Location = new System.Drawing.Point(28, 387);
+            this.cekShareTextBox.Name = "cekShareTextBox";
+            this.cekShareTextBox.Size = new System.Drawing.Size(142, 31);
+            this.cekShareTextBox.TabIndex = 4;
+            // 
+            // cekShareButton
+            // 
+            this.cekShareButton.Location = new System.Drawing.Point(62, 424);
+            this.cekShareButton.Name = "cekShareButton";
+            this.cekShareButton.Size = new System.Drawing.Size(108, 30);
+            this.cekShareButton.TabIndex = 3;
+            this.cekShareButton.Text = "Cek Share";
+            this.cekShareButton.UseVisualStyleBackColor = true;
+            this.cekShareButton.Click += new System.EventHandler(this.button2_Click);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(28, 431);
+            this.button1.Location = new System.Drawing.Point(28, 490);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(87, 26);
             this.button1.TabIndex = 2;
@@ -726,7 +735,7 @@
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.panel);
             this.Name = "MainForm";
-            this.Text = "MainForm";
+            this.Text = "ProShare";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.panel.ResumeLayout(false);
             this.splitContainer.Panel1.ResumeLayout(false);
@@ -734,6 +743,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
             this.menuGroupBox.ResumeLayout(false);
+            this.menuGroupBox.PerformLayout();
             this.stackPanel.ResumeLayout(false);
             this.Operations.ResumeLayout(false);
             this.operationsTabControl.ResumeLayout(false);
@@ -822,8 +832,9 @@
         private System.Windows.Forms.Button browseBrowseButton;
         private System.Windows.Forms.OpenFileDialog browseOpenFileDialog;
         private System.Windows.Forms.SaveFileDialog ntfSaveFileDialog;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button cekShareButton;
         private System.Windows.Forms.OpenFileDialog cekOpenFileDialog;
         private System.Windows.Forms.SaveFileDialog cekSaveFileDialog;
+        private System.Windows.Forms.TextBox cekShareTextBox;
     }
 }
