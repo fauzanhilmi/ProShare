@@ -556,12 +556,30 @@ namespace ProShare
                                         RemoveClickEvent(ntfConfButton1);
                                         ntfConfButton1.Click += (o1, e1) => //If scheme is already deleted, it does nothing
                                         {
-                                            MQHandler.Ack(DeliveryTag);
-                                            MQHandler.SendDirectMessage("Generate", "Response", scheme, username, sender, BitConverter.GetBytes(true)); //here sender = destination!
                                             try
                                             {
                                                 DatabaseHandler.Connect();
                                                 DatabaseHandler.IncrementConfirmations(scheme);
+
+                                                MQHandler.Ack(DeliveryTag);
+                                                MQHandler.SendDirectMessage("Generate", "Response", scheme, username, sender, BitConverter.GetBytes(true)); //here sender = destination!
+
+                                                List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                                                ulong n = (ulong)schemeInfos[4];
+                                                ulong num_of_confirmations = (ulong)schemeInfos[5];
+                                                //Send notifications if all players have been accepted
+                                                if (num_of_confirmations == n)
+                                                {
+                                                    MQHandler.SendFanoutMessages("Generate", "Notice", scheme, username, BitConverter.GetBytes(true));
+                                                    MQHandler.SendDirectMessage("Generate", "Dealer", scheme, "System", username, ASCIIEncoding.ASCII.GetBytes("")); //send special request to dealer
+                                                }
+
+                                                ntfConfLabel2.Text = "You accepted this request.";
+                                                ntfConfButton1.Visible = false;
+                                                ntfConfButton2.Visible = false;
+                                                ntfPanel.Controls.Remove(ntfButton);
+                                                ntfButton.Dispose();
+                                                //DecrementNotifications(); //Why it isn't working :(
                                                 DatabaseHandler.Close();
                                             }
                                             catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -569,12 +587,6 @@ namespace ProShare
                                                 Debug.WriteLine(ex.Number + " : " + ex.Message);
                                                 MessageBox.Show("Something went wrong. Please try again");
                                             }
-                                            ntfConfLabel2.Text = "You accepted this request.";
-                                            ntfConfButton1.Visible = false;
-                                            ntfConfButton2.Visible = false;
-                                            ntfPanel.Controls.Remove(ntfButton);
-                                            ntfButton.Dispose();
-                                            //DecrementNotifications(); //Why it isn't working :(
                                         };
 
                                         ntfConfButton2.Text = "Reject";
@@ -626,13 +638,6 @@ namespace ProShare
                                                 ulong n = (ulong)schemeInfos[4];
                                                 ulong num_of_confirmations = (ulong)schemeInfos[5];
                                                 ntfConfLabel2.Text = "Number of confirmations so far : " + num_of_confirmations + "/" + n;
-
-                                                //Send notifications if all players have been accepted
-                                                if(num_of_confirmations == n)
-                                                {
-                                                    MQHandler.SendFanoutMessages("Generate", "Notice", scheme, username, BitConverter.GetBytes(true));
-                                                    MQHandler.SendDirectMessage("Generate", "Dealer", scheme, "System", username, ASCIIEncoding.ASCII.GetBytes("")); //send special request to dealer
-                                                }
                                                 DatabaseHandler.Close();
                                             }
                                             catch (MySql.Data.MySqlClient.MySqlException ex)
