@@ -88,6 +88,7 @@
             this.ntfSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.cekOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.cekSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.deleteButton = new System.Windows.Forms.Button();
             this.panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -144,6 +145,7 @@
             // 
             // menuGroupBox
             // 
+            this.menuGroupBox.Controls.Add(this.deleteButton);
             this.menuGroupBox.Controls.Add(this.cekShareTextBox);
             this.menuGroupBox.Controls.Add(this.cekShareButton);
             this.menuGroupBox.Controls.Add(this.button1);
@@ -161,14 +163,14 @@
             // 
             // cekShareTextBox
             // 
-            this.cekShareTextBox.Location = new System.Drawing.Point(28, 387);
+            this.cekShareTextBox.Location = new System.Drawing.Point(28, 357);
             this.cekShareTextBox.Name = "cekShareTextBox";
             this.cekShareTextBox.Size = new System.Drawing.Size(142, 31);
             this.cekShareTextBox.TabIndex = 4;
             // 
             // cekShareButton
             // 
-            this.cekShareButton.Location = new System.Drawing.Point(62, 424);
+            this.cekShareButton.Location = new System.Drawing.Point(62, 394);
             this.cekShareButton.Name = "cekShareButton";
             this.cekShareButton.Size = new System.Drawing.Size(108, 30);
             this.cekShareButton.TabIndex = 3;
@@ -728,6 +730,16 @@
             // 
             this.cekOpenFileDialog.FileName = "cekOpenFileDialog";
             // 
+            // deleteButton
+            // 
+            this.deleteButton.Location = new System.Drawing.Point(35, 430);
+            this.deleteButton.Name = "deleteButton";
+            this.deleteButton.Size = new System.Drawing.Size(135, 33);
+            this.deleteButton.TabIndex = 8;
+            this.deleteButton.Text = "Delete";
+            this.deleteButton.UseVisualStyleBackColor = true;
+            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -836,5 +848,6 @@
         private System.Windows.Forms.OpenFileDialog cekOpenFileDialog;
         private System.Windows.Forms.SaveFileDialog cekSaveFileDialog;
         private System.Windows.Forms.TextBox cekShareTextBox;
+        private System.Windows.Forms.Button deleteButton;
     }
 }
