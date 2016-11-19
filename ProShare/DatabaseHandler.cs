@@ -474,5 +474,28 @@ namespace ProShare
             }
             return players;
         }
+
+        public static List<string> GetSchemesByPlayer(string player)
+        {
+            List<string> schemes = new List<string>();
+            try
+            {
+                string query = "SELECT scheme FROM players WHERE player ='" + player + "'";
+                Debug.WriteLine(query);
+                MySqlCommand cmd = new MySqlCommand(query, SqlConn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //Debug.WriteLine(reader.GetString(0));
+                    schemes.Add(reader.GetString(0));
+                }
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                Debug.WriteLine(ex.Number + " " + ex.Message);
+                throw;
+            }
+            return schemes;
+        }
     }
 }

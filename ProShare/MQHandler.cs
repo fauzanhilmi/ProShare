@@ -112,7 +112,9 @@ namespace ProShare
         //Called by dealer to send share requests to all players
         public static void SendShareRequests(string scheme, string dealer, List<string> players)
         {
-            model.ExchangeDeclare(scheme, ExchangeType.Topic, true, false);
+            //TEST
+            //model.ExchangeDeclare(scheme, ExchangeType.Topic, true, false);
+            model.ExchangeDeclare(scheme, ExchangeType.Direct, true, false);
 
             //Bind dealer
             model.QueueBind(dealer, scheme, dealer);

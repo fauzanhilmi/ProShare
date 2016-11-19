@@ -233,10 +233,10 @@ namespace ProShare
             {
                 throw new System.ArgumentException("Share file locations cannot be empty and k cannot be 0", "ShareFilesNames and k");
             }
-            if (ShareFilesLocations.Length < k)
+            /*if (ShareFilesLocations.Length < k)
             {
                 throw new System.ArgumentException("The number of Share files cannot be less than k", "ShareFilesNames and k");
-            }
+            }*/
 
             try
             {

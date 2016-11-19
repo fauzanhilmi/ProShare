@@ -31,6 +31,7 @@
             this.panel = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.menuGroupBox = new System.Windows.Forms.GroupBox();
+            this.deleteButton = new System.Windows.Forms.Button();
             this.cekShareTextBox = new System.Windows.Forms.TextBox();
             this.cekShareButton = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
@@ -62,7 +63,20 @@
             this.genNameGroupBox = new System.Windows.Forms.GroupBox();
             this.genNameTextBox = new System.Windows.Forms.TextBox();
             this.reconstructTabPage = new System.Windows.Forms.TabPage();
+            this.recGenerateGroupBox = new System.Windows.Forms.GroupBox();
+            this.recGenerateSchemeLabel = new System.Windows.Forms.Label();
+            this.recGenerateButton = new System.Windows.Forms.Button();
+            this.recSchemesComboBox2 = new System.Windows.Forms.ComboBox();
+            this.recSharesTextBox = new System.Windows.Forms.TextBox();
+            this.recBrowseButton = new System.Windows.Forms.Button();
+            this.recSchemeGroupBox = new System.Windows.Forms.GroupBox();
+            this.recRequestSchemeLabel = new System.Windows.Forms.Label();
+            this.recSchemesComboBox = new System.Windows.Forms.ComboBox();
+            this.recSendButton = new System.Windows.Forms.Button();
             this.udpateTabPage = new System.Windows.Forms.TabPage();
+            this.updSendButton = new System.Windows.Forms.Button();
+            this.updSchemeGroupBox = new System.Windows.Forms.GroupBox();
+            this.updSchemesComboBox = new System.Windows.Forms.ComboBox();
             this.Notifications = new System.Windows.Forms.TabPage();
             this.ntfTabControl = new System.Windows.Forms.TabControl();
             this.ntfTabPage = new System.Windows.Forms.TabPage();
@@ -88,7 +102,10 @@
             this.ntfSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.cekOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.cekSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.deleteButton = new System.Windows.Forms.Button();
+            this.ntfRecOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.recOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.recSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ntfRecSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -106,6 +123,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.genKNumericUpDown)).BeginInit();
             this.genSecretGroupBox.SuspendLayout();
             this.genNameGroupBox.SuspendLayout();
+            this.reconstructTabPage.SuspendLayout();
+            this.recGenerateGroupBox.SuspendLayout();
+            this.recSchemeGroupBox.SuspendLayout();
+            this.udpateTabPage.SuspendLayout();
+            this.updSchemeGroupBox.SuspendLayout();
             this.Notifications.SuspendLayout();
             this.ntfTabControl.SuspendLayout();
             this.ntfTabPage.SuspendLayout();
@@ -160,6 +182,16 @@
             this.menuGroupBox.TabIndex = 0;
             this.menuGroupBox.TabStop = false;
             this.menuGroupBox.Text = "Hello, [USERNAME]!";
+            // 
+            // deleteButton
+            // 
+            this.deleteButton.Location = new System.Drawing.Point(35, 430);
+            this.deleteButton.Name = "deleteButton";
+            this.deleteButton.Size = new System.Drawing.Size(135, 33);
+            this.deleteButton.TabIndex = 8;
+            this.deleteButton.Text = "Delete";
+            this.deleteButton.UseVisualStyleBackColor = true;
+            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
             // 
             // cekShareTextBox
             // 
@@ -259,7 +291,7 @@
             this.generateTabPage.Padding = new System.Windows.Forms.Padding(3);
             this.generateTabPage.Size = new System.Drawing.Size(523, 475);
             this.generateTabPage.TabIndex = 0;
-            this.generateTabPage.Text = "Generate Shares";
+            this.generateTabPage.Text = "Share Generation";
             this.generateTabPage.UseVisualStyleBackColor = true;
             // 
             // genStatusPanel
@@ -498,22 +530,157 @@
             // 
             // reconstructTabPage
             // 
+            this.reconstructTabPage.Controls.Add(this.recGenerateGroupBox);
+            this.reconstructTabPage.Controls.Add(this.recSchemeGroupBox);
             this.reconstructTabPage.Location = new System.Drawing.Point(4, 22);
             this.reconstructTabPage.Name = "reconstructTabPage";
             this.reconstructTabPage.Padding = new System.Windows.Forms.Padding(3);
             this.reconstructTabPage.Size = new System.Drawing.Size(523, 475);
             this.reconstructTabPage.TabIndex = 1;
-            this.reconstructTabPage.Text = "Reconstruct Secret";
+            this.reconstructTabPage.Text = "Secret Reconstruction";
             this.reconstructTabPage.UseVisualStyleBackColor = true;
+            // 
+            // recGenerateGroupBox
+            // 
+            this.recGenerateGroupBox.Controls.Add(this.recGenerateSchemeLabel);
+            this.recGenerateGroupBox.Controls.Add(this.recGenerateButton);
+            this.recGenerateGroupBox.Controls.Add(this.recSchemesComboBox2);
+            this.recGenerateGroupBox.Controls.Add(this.recSharesTextBox);
+            this.recGenerateGroupBox.Controls.Add(this.recBrowseButton);
+            this.recGenerateGroupBox.Location = new System.Drawing.Point(3, 157);
+            this.recGenerateGroupBox.Name = "recGenerateGroupBox";
+            this.recGenerateGroupBox.Size = new System.Drawing.Size(530, 171);
+            this.recGenerateGroupBox.TabIndex = 7;
+            this.recGenerateGroupBox.TabStop = false;
+            this.recGenerateGroupBox.Text = "Reconstruct Secret";
+            // 
+            // recGenerateSchemeLabel
+            // 
+            this.recGenerateSchemeLabel.AutoSize = true;
+            this.recGenerateSchemeLabel.Location = new System.Drawing.Point(35, 41);
+            this.recGenerateSchemeLabel.Name = "recGenerateSchemeLabel";
+            this.recGenerateSchemeLabel.Size = new System.Drawing.Size(55, 13);
+            this.recGenerateSchemeLabel.TabIndex = 9;
+            this.recGenerateSchemeLabel.Text = "Scheme : ";
+            // 
+            // recGenerateButton
+            // 
+            this.recGenerateButton.Location = new System.Drawing.Point(368, 117);
+            this.recGenerateButton.Name = "recGenerateButton";
+            this.recGenerateButton.Size = new System.Drawing.Size(126, 41);
+            this.recGenerateButton.TabIndex = 7;
+            this.recGenerateButton.Text = "Reconstruct Secret";
+            this.recGenerateButton.UseVisualStyleBackColor = true;
+            this.recGenerateButton.Click += new System.EventHandler(this.recGenerateButton_Click);
+            // 
+            // recSchemesComboBox2
+            // 
+            this.recSchemesComboBox2.FormattingEnabled = true;
+            this.recSchemesComboBox2.Location = new System.Drawing.Point(96, 38);
+            this.recSchemesComboBox2.Name = "recSchemesComboBox2";
+            this.recSchemesComboBox2.Size = new System.Drawing.Size(324, 21);
+            this.recSchemesComboBox2.TabIndex = 8;
+            this.recSchemesComboBox2.Text = "You are not involved in any schemes";
+            // 
+            // recSharesTextBox
+            // 
+            this.recSharesTextBox.Location = new System.Drawing.Point(38, 79);
+            this.recSharesTextBox.Name = "recSharesTextBox";
+            this.recSharesTextBox.Size = new System.Drawing.Size(338, 20);
+            this.recSharesTextBox.TabIndex = 4;
+            this.recSharesTextBox.Text = "Select files";
+            this.recSharesTextBox.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            // 
+            // recBrowseButton
+            // 
+            this.recBrowseButton.Location = new System.Drawing.Point(382, 78);
+            this.recBrowseButton.Name = "recBrowseButton";
+            this.recBrowseButton.Size = new System.Drawing.Size(77, 20);
+            this.recBrowseButton.TabIndex = 5;
+            this.recBrowseButton.Text = "Browse";
+            this.recBrowseButton.UseVisualStyleBackColor = true;
+            this.recBrowseButton.Click += new System.EventHandler(this.recBrowseButton_Click);
+            // 
+            // recSchemeGroupBox
+            // 
+            this.recSchemeGroupBox.Controls.Add(this.recRequestSchemeLabel);
+            this.recSchemeGroupBox.Controls.Add(this.recSchemesComboBox);
+            this.recSchemeGroupBox.Controls.Add(this.recSendButton);
+            this.recSchemeGroupBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.recSchemeGroupBox.Location = new System.Drawing.Point(3, 3);
+            this.recSchemeGroupBox.Name = "recSchemeGroupBox";
+            this.recSchemeGroupBox.Size = new System.Drawing.Size(517, 119);
+            this.recSchemeGroupBox.TabIndex = 1;
+            this.recSchemeGroupBox.TabStop = false;
+            this.recSchemeGroupBox.Text = "Send Reconstruction Requests";
+            // 
+            // recRequestSchemeLabel
+            // 
+            this.recRequestSchemeLabel.AutoSize = true;
+            this.recRequestSchemeLabel.Location = new System.Drawing.Point(35, 26);
+            this.recRequestSchemeLabel.Name = "recRequestSchemeLabel";
+            this.recRequestSchemeLabel.Size = new System.Drawing.Size(55, 13);
+            this.recRequestSchemeLabel.TabIndex = 7;
+            this.recRequestSchemeLabel.Text = "Scheme : ";
+            // 
+            // recSchemesComboBox
+            // 
+            this.recSchemesComboBox.FormattingEnabled = true;
+            this.recSchemesComboBox.Location = new System.Drawing.Point(96, 23);
+            this.recSchemesComboBox.Name = "recSchemesComboBox";
+            this.recSchemesComboBox.Size = new System.Drawing.Size(324, 21);
+            this.recSchemesComboBox.TabIndex = 0;
+            this.recSchemesComboBox.Text = "You are not involved in any schemes";
+            // 
+            // recSendButton
+            // 
+            this.recSendButton.Location = new System.Drawing.Point(368, 62);
+            this.recSendButton.Name = "recSendButton";
+            this.recSendButton.Size = new System.Drawing.Size(126, 38);
+            this.recSendButton.TabIndex = 6;
+            this.recSendButton.Text = "Send Requests";
+            this.recSendButton.UseVisualStyleBackColor = true;
+            this.recSendButton.Click += new System.EventHandler(this.recSendButton_Click);
             // 
             // udpateTabPage
             // 
+            this.udpateTabPage.Controls.Add(this.updSendButton);
+            this.udpateTabPage.Controls.Add(this.updSchemeGroupBox);
             this.udpateTabPage.Location = new System.Drawing.Point(4, 22);
             this.udpateTabPage.Name = "udpateTabPage";
             this.udpateTabPage.Size = new System.Drawing.Size(523, 475);
             this.udpateTabPage.TabIndex = 2;
-            this.udpateTabPage.Text = "Update Shares";
+            this.udpateTabPage.Text = "Shares Update";
             this.udpateTabPage.UseVisualStyleBackColor = true;
+            // 
+            // updSendButton
+            // 
+            this.updSendButton.Location = new System.Drawing.Point(349, 76);
+            this.updSendButton.Name = "updSendButton";
+            this.updSendButton.Size = new System.Drawing.Size(171, 44);
+            this.updSendButton.TabIndex = 7;
+            this.updSendButton.Text = "Send Shares Update Requests";
+            this.updSendButton.UseVisualStyleBackColor = true;
+            this.updSendButton.Click += new System.EventHandler(this.updSendButton_Click);
+            // 
+            // updSchemeGroupBox
+            // 
+            this.updSchemeGroupBox.Controls.Add(this.updSchemesComboBox);
+            this.updSchemeGroupBox.Location = new System.Drawing.Point(3, 3);
+            this.updSchemeGroupBox.Name = "updSchemeGroupBox";
+            this.updSchemeGroupBox.Size = new System.Drawing.Size(517, 67);
+            this.updSchemeGroupBox.TabIndex = 2;
+            this.updSchemeGroupBox.TabStop = false;
+            this.updSchemeGroupBox.Text = "Specify scheme";
+            // 
+            // updSchemesComboBox
+            // 
+            this.updSchemesComboBox.FormattingEnabled = true;
+            this.updSchemesComboBox.Location = new System.Drawing.Point(88, 23);
+            this.updSchemesComboBox.Name = "updSchemesComboBox";
+            this.updSchemesComboBox.Size = new System.Drawing.Size(325, 21);
+            this.updSchemesComboBox.TabIndex = 1;
+            this.updSchemesComboBox.Text = "You are not involved in any schemes";
             // 
             // Notifications
             // 
@@ -730,16 +897,6 @@
             // 
             this.cekOpenFileDialog.FileName = "cekOpenFileDialog";
             // 
-            // deleteButton
-            // 
-            this.deleteButton.Location = new System.Drawing.Point(35, 430);
-            this.deleteButton.Name = "deleteButton";
-            this.deleteButton.Size = new System.Drawing.Size(135, 33);
-            this.deleteButton.TabIndex = 8;
-            this.deleteButton.Text = "Delete";
-            this.deleteButton.UseVisualStyleBackColor = true;
-            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -772,6 +929,13 @@
             this.genSecretGroupBox.PerformLayout();
             this.genNameGroupBox.ResumeLayout(false);
             this.genNameGroupBox.PerformLayout();
+            this.reconstructTabPage.ResumeLayout(false);
+            this.recGenerateGroupBox.ResumeLayout(false);
+            this.recGenerateGroupBox.PerformLayout();
+            this.recSchemeGroupBox.ResumeLayout(false);
+            this.recSchemeGroupBox.PerformLayout();
+            this.udpateTabPage.ResumeLayout(false);
+            this.updSchemeGroupBox.ResumeLayout(false);
             this.Notifications.ResumeLayout(false);
             this.ntfTabControl.ResumeLayout(false);
             this.ntfTabPage.ResumeLayout(false);
@@ -849,5 +1013,22 @@
         private System.Windows.Forms.SaveFileDialog cekSaveFileDialog;
         private System.Windows.Forms.TextBox cekShareTextBox;
         private System.Windows.Forms.Button deleteButton;
+        private System.Windows.Forms.GroupBox recSchemeGroupBox;
+        private System.Windows.Forms.Button recSendButton;
+        private System.Windows.Forms.GroupBox updSchemeGroupBox;
+        private System.Windows.Forms.Button updSendButton;
+        private System.Windows.Forms.ComboBox recSchemesComboBox;
+        private System.Windows.Forms.ComboBox updSchemesComboBox;
+        private System.Windows.Forms.OpenFileDialog ntfRecOpenFileDialog;
+        private System.Windows.Forms.GroupBox recGenerateGroupBox;
+        private System.Windows.Forms.Button recGenerateButton;
+        private System.Windows.Forms.TextBox recSharesTextBox;
+        private System.Windows.Forms.Button recBrowseButton;
+        private System.Windows.Forms.Label recRequestSchemeLabel;
+        private System.Windows.Forms.Label recGenerateSchemeLabel;
+        private System.Windows.Forms.ComboBox recSchemesComboBox2;
+        private System.Windows.Forms.OpenFileDialog recOpenFileDialog;
+        private System.Windows.Forms.SaveFileDialog recSaveFileDialog;
+        private System.Windows.Forms.SaveFileDialog ntfRecSaveFileDialog;
     }
 }

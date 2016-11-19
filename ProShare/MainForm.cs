@@ -35,11 +35,15 @@ namespace ProShare
         private string genEmptyPlayer2 = ")";
         private string genFirstStatus = "Sending share requests...";
 
+        /*      RECONSTRUCT attributes      */
+        private string recEmptySchemeText = "You are not involved in any scheme";
+        private string recEmptyFile = "Select a file";
+        private string[] recShareFiles;
 
         /*      Notifications attributes         */
         private int numOfNotifications = 0;
         private string browseEmptyText = "Enter a text...";
-        private string browseEmptyFile = "Select a file";
+        private string browseEmptyFile = "Select files";
         //private byte[] current_bytes;
         //private byte current_k; //for Generate - Dealer
         //private byte current_n;
@@ -66,20 +70,6 @@ namespace ProShare
             //TEST
             //username = "fauzan";
 
-            //string sch = "BODO";
-            //try
-            //{
-            //    DatabaseHandler.Connect();
-            //    DatabaseHandler.DeleteScheme(sch);
-            //    DatabaseHandler.Close();
-            //}
-            //catch (MySql.Data.MySqlClient.MySqlException ex)
-            //{
-            //    MessageBox.Show("Something went wrong. Please try again.");
-            //}
-            //MQHandler.DeleteExchange(sch);
-            //TEST
-
             this.MaximizeBox = false;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = ColorTranslator.FromHtml("#00B0F0");
@@ -92,6 +82,9 @@ namespace ProShare
 
             MQHandler.GetMessage(username, ProcessNotification); //Listening to incoming notifications
             ntfDictionary = new Dictionary<ulong, IDictionary<string, object>>();
+
+            /*              General initializations             */
+            operationsTabControl.SelectedIndexChanged += OperationsTabControl_SelectedIndexChanged;
 
             /*              GENERATE initializations            */
             genSecretGroupBox.Visible = false; //MIGHT BE changed??
@@ -136,6 +129,89 @@ namespace ProShare
             ntfConfButton2.Visible = false;
             browseSecretTextBox.Text = browseEmptyText;
             browseGenerateButton.Enabled = true;
+        }
+
+        private void OperationsTabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //MessageBox.Show((sender as TabControl).SelectedIndex.ToString());
+            switch((sender as TabControl).SelectedIndex)
+            {
+                case 0: //share generation
+                    {
+                        break;
+                    }
+                case 1: //secret reconstruction
+                    {
+                        List<string> schemes = new List<string>();
+                        try
+                        {
+                            DatabaseHandler.Connect();
+                            schemes = DatabaseHandler.GetSchemesByPlayer(username);
+                            DatabaseHandler.Close();
+                        }
+                        catch (MySql.Data.MySqlClient.MySqlException ex)
+                        {
+                            MessageBox.Show(ex.Message, "Unexpected " + ex.Number + " Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
+                        if (schemes.Count == 0)
+                        {
+                            recSchemesComboBox.Text = recEmptySchemeText;
+                            recSendButton.Enabled = false;
+                            recSchemesComboBox2.Text = recEmptySchemeText;
+                            recGenerateButton.Enabled = false;
+                        }
+                        else
+                        {
+                            BindingSource bs = new BindingSource();
+                            bs.DataSource = schemes;
+                            recSchemesComboBox.DataSource = bs;
+                            recSendButton.Enabled = true;
+                            BindingSource bs2 = new BindingSource();
+                            bs2.DataSource = schemes;
+                            recSchemesComboBox2.DataSource = bs2;
+                            recGenerateButton.Enabled = true;
+                        }
+                        break;
+                    }
+                case 2: //share update
+                    {
+                        List<string> schemes = new List<string>();
+                        try
+                        {
+                            DatabaseHandler.Connect();
+                            schemes = DatabaseHandler.GetSchemesByPlayer(username);
+                            DatabaseHandler.Close();
+                        }
+                        catch (MySql.Data.MySqlClient.MySqlException ex)
+                        {
+                            MessageBox.Show(ex.Message, "Unexpected " + ex.Number + " Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
+                        if (schemes.Count == 0)
+                        {
+                            //recSchemesComboBox.Text = recEmptySchemeText;
+                            //recSendButton.Enabled = false;
+                            //recSchemesComboBox2.Text = recEmptySchemeText;
+                            //recGenerateButton.Enabled = false;
+
+                        }
+                        else
+                        {
+                            BindingSource bs = new BindingSource();
+                            bs.DataSource = schemes;
+                            recSchemesComboBox.DataSource = bs;
+                            recSendButton.Enabled = true;
+                            BindingSource bs2 = new BindingSource();
+                            bs2.DataSource = schemes;
+                            recSchemesComboBox2.DataSource = bs2;
+                            recGenerateButton.Enabled = true;
+                        }
+
+
+                        break;
+                    }
+            }
         }
 
         private void operationsButton_Click(object sender, EventArgs e)
@@ -421,9 +497,7 @@ namespace ProShare
                             //MQHandler.Close();
 
                             MQHandler.SendShareRequests(schemeName, username, players);
-                            //TEST
-
-
+                            
                             MessageBox.Show("Share requests were sent sucessfully", "Share Requests Delivery Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             genStatusLabel.Visible = false;
                             //genStatusLabel.Text = genFirstStatus;
@@ -451,6 +525,92 @@ namespace ProShare
             {
                 MessageBox.Show(ex.Message, "Database Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        /*          RECONSTRUCT Methods             */
+        private void recSendButton_Click(object sender, EventArgs e)
+        {
+            if (recSchemesComboBox.Text == recEmptySchemeText)
+            {
+                //do nothing
+            }
+            else
+            {
+                string scheme = recSchemesComboBox.Text;
+                try
+                {
+                    DatabaseHandler.Connect();
+                    DatabaseHandler.ResetConfirmations(scheme);
+                    DatabaseHandler.Close();
+
+                    MQHandler.SendFanoutMessages("Reconstruct", "Request", scheme, username, ASCIIEncoding.ASCII.GetBytes(""));
+                    MessageBox.Show("Reconstruction requests delivery is completed", "Delivery Succeed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (MySql.Data.MySqlClient.MySqlException ex)
+                {
+                    MessageBox.Show(ex.Message, "Unexpected " + ex.Number + " Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void recBrowseButton_Click(object sender, EventArgs e)
+        {
+            recOpenFileDialog.Multiselect = true;
+            DialogResult result = recOpenFileDialog.ShowDialog();
+            if(result == DialogResult.OK)
+            {
+                recShareFiles = recOpenFileDialog.FileNames;
+                string oneline = "";
+                foreach(string file in recShareFiles)
+                {
+                    string current = "\"" + Path.GetFileName(file) + "\"";
+                    oneline += current;
+                }
+                recSharesTextBox.Text = oneline;
+            }
+            else
+            {
+                recSharesTextBox.Text = recEmptyFile;
+            }
+        }
+
+        private void recGenerateButton_Click(object sender, EventArgs e)
+        {
+            string scheme = recSchemesComboBox2.Text;
+            if (scheme == recEmptySchemeText)
+            {
+                //do nothing
+            }
+            else
+            {
+                if(recSharesTextBox.Text != recEmptyFile)
+                {
+                    DialogResult dr = recSaveFileDialog.ShowDialog();
+                    if(dr == DialogResult.OK)
+                    {
+                        try
+                        {
+                            DatabaseHandler.Connect();
+                            List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                            byte k = (byte)(ulong)schemeInfos[3];
+                            byte n = (byte)(ulong)schemeInfos[4];
+                            SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName);
+                            //File.WriteAllBytes(filename, current_bytes);
+                            MessageBox.Show("Secret reconstruction process is completed", "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        catch (MySql.Data.MySqlClient.MySqlException ex)
+                        {
+                            Debug.WriteLine(ex.Number + " " + ex.Message);
+                        }
+                    }
+                }
+            }
+        }
+
+        /*          UPDATE methods                  */
+        private void updSendButton_Click(object sender, EventArgs e)
+        {
+
         }
 
         /*          Notification methods            */
@@ -565,13 +725,14 @@ namespace ProShare
                                                 MQHandler.SendDirectMessage("Generate", "Response", scheme, username, sender, BitConverter.GetBytes(true)); //here sender = destination!
 
                                                 List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                                                string dealer = (string)schemeInfos[2];
                                                 ulong n = (ulong)schemeInfos[4];
                                                 ulong num_of_confirmations = (ulong)schemeInfos[5];
                                                 //Send notifications if all players have been accepted
                                                 if (num_of_confirmations == n)
                                                 {
-                                                    MQHandler.SendFanoutMessages("Generate", "Notice", scheme, username, BitConverter.GetBytes(true));
-                                                    MQHandler.SendDirectMessage("Generate", "Dealer", scheme, "System", username, ASCIIEncoding.ASCII.GetBytes("")); //send special request to dealer
+                                                    MQHandler.SendFanoutMessages("Generate", "Notice", scheme, dealer, BitConverter.GetBytes(true));
+                                                    MQHandler.SendDirectMessage("Generate", "Dealer", scheme, "System", dealer, ASCIIEncoding.ASCII.GetBytes("")); //send special request to dealer
                                                 }
 
                                                 ntfConfLabel2.Text = "You accepted this request.";
@@ -638,6 +799,7 @@ namespace ProShare
                                                 ulong n = (ulong)schemeInfos[4];
                                                 ulong num_of_confirmations = (ulong)schemeInfos[5];
                                                 ntfConfLabel2.Text = "Number of confirmations so far : " + num_of_confirmations + "/" + n;
+                                                ntfConfLabel2.Visible = true;
                                                 DatabaseHandler.Close();
                                             }
                                             catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -686,7 +848,7 @@ namespace ProShare
                                     }
                                     else
                                     {
-                                        bText = "[" + scheme + "] " + " Scheme failed to advances to share distribution";
+                                        bText = "[" + scheme + "] " + " Scheme fails to advance to share distribution";
                                         label1Text = "Bad news, one or more player(s) have rejected the share request.";
                                         label2Text = "Now the scheme '" + scheme + "'cannot be used and will be deleted.";
                                     }
@@ -928,6 +1090,172 @@ namespace ProShare
                     }
                 case "Reconstruct":
                     {
+                        switch(type)
+                        {
+                            case "Request":
+                                {
+                                    ntfButton.Text = "[" + scheme + "] " + sender + " requests secret reconstruction";
+                                    ntfButton.Click += (o, e) =>
+                                    {
+                                        ntfActionStackPanel.SelectTab(0); //Action
+                                        ntfConfLabel1.Text = sender + " has requested a secret reconstruction on scheme '" + scheme + "'";
+                                        ntfConfLabel1.Visible = true;
+                                        ntfConfLabel2.Text = "If you approved this request, upload and send your share. Otherwise, click 'Reject'";
+                                        ntfConfLabel2.Visible = true;
+
+                                        ntfConfButton1.Text = "Upload...";
+                                        ntfConfButton1.Visible = true;
+                                        RemoveClickEvent(ntfConfButton1);
+                                        ntfConfButton1.Click += (o1, e1) =>
+                                        {
+                                            DialogResult result = ntfRecOpenFileDialog.ShowDialog();
+                                            if (result == DialogResult.OK)
+                                            {
+                                                string shareFile = ntfRecOpenFileDialog.FileName;
+                                                ntfConfLabel2.Text = "You have uploaded share file '" + Path.GetFileName(shareFile) + "'. Click 'Send' to send it to " + sender + ".";
+                                                ntfConfButton1.Text = "Send";
+                                                RemoveClickEvent(ntfConfButton1);
+                                                ntfConfButton1.Click += (o11, e11) =>
+                                                {
+                                                    try
+                                                    {
+                                                        DatabaseHandler.Connect();
+                                                        DatabaseHandler.IncrementConfirmations(scheme);
+                                                        DatabaseHandler.Close();
+                                                        byte[] shareBytes = null;
+                                                        using (FileStream fs = new FileStream(shareFile, FileMode.Open, FileAccess.Read))
+                                                        {
+                                                            shareBytes = new byte[fs.Length];
+                                                            int bytesLeft = (int)fs.Length;
+                                                            int bytesRead = 0;
+                                                            while (bytesLeft > 0)
+                                                            {
+                                                                int res = fs.Read(shareBytes, bytesRead, bytesLeft);
+                                                                if (res == 0)
+                                                                    break;
+                                                                bytesRead += res;
+                                                                bytesLeft -= res;
+                                                            }
+                                                        }
+                                                        //byte[] shareBytes = ASCIIEncoding.ASCII.GetBytes(shareFile);
+                                                        MQHandler.SendDirectMessage("Reconstruct", "Response", scheme, username, sender, shareBytes);
+
+                                                        ntfConfLabel2.Text = "You have sent your share to " + sender + ".";
+                                                        ntfConfButton1.Visible = false;
+                                                        ntfConfButton2.Visible = false;
+                                                        
+                                                        MQHandler.Ack(DeliveryTag);
+                                                        ntfPanel.Controls.Remove(ntfButton);
+                                                        ntfButton.Dispose();
+
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        Console.WriteLine(ex.ToString());
+                                                    }
+                                                };
+                                            }
+                                        };
+                                        ntfConfButton2.Text = "Reject";
+                                        ntfConfButton2.Visible = true;
+                                        RemoveClickEvent(ntfConfButton2);
+                                        ntfConfButton2.Click += (o2, e2) =>
+                                        {
+                                            try
+                                            {
+                                                DatabaseHandler.Connect();
+                                                DatabaseHandler.IncrementConfirmations(scheme);
+                                                DatabaseHandler.Close();
+                                                MQHandler.SendDirectMessage("Reconstruct", "Response", scheme, username, sender, BitConverter.GetBytes(false));
+                                                ntfConfLabel2.Text = "You have rejected " + sender + "'s reconstruction request.";
+                                                ntfConfButton1.Visible = false;
+                                                ntfConfButton2.Visible = false;
+
+                                                MQHandler.Ack(DeliveryTag);
+                                                ntfPanel.Controls.Remove(ntfButton);
+                                                ntfButton.Dispose();
+                                            }
+                                            catch (MySql.Data.MySqlClient.MySqlException ex)
+                                            {
+                                                Debug.WriteLine(ex.Number + " " + ex.Message);
+                                            }
+                                        };
+                                    };
+                                    break;
+                                }
+                            case "Response":
+                                {
+                                    string bText = "", label1Text = "", label2Text = "";
+                                    bool isApproved;
+                                    if (message.Length > 1) //approve
+                                    {
+                                        isApproved = true;
+                                        bText = "[" + scheme + "] " + sender + " approved your reconstruction request";
+                                        label1Text = "Click 'Save' to save " + sender + "'s share to your disk.";
+                                    }
+                                    else //reject
+                                    {
+                                        isApproved = false;
+                                        bText = "[" + scheme + "] " + sender + " rejected your reconstruction request";
+                                        label1Text = sender + " has rejected your reconstruction request on scheme '" + scheme + "'";
+                                    }
+                                    ntfButton.Text = bText;
+                                    ntfButton.Click += (o, e) =>
+                                    {
+                                        //MQHandler.Ack(DeliveryTag);
+                                        ntfConfLabel1.Text = label1Text;
+                                        ntfConfLabel1.Visible = true;
+                                        try
+                                        {
+                                            DatabaseHandler.Connect();
+                                            List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                                            ulong n = (ulong)schemeInfos[4];
+                                            ulong num_of_confirmations = (ulong)schemeInfos[5];
+                                            ntfConfLabel2.Text = "Number of confirmations so far : " + num_of_confirmations + "/" + n;
+                                            ntfConfLabel2.Visible = true;
+                                            ntfConfButton1.Visible = false;
+
+                                            if (isApproved)
+                                            {
+                                                ntfConfButton2.Text = "Save";
+                                                ntfConfButton2.Visible = true;
+                                                RemoveClickEvent(ntfConfButton2);
+                                                ntfConfButton2.Click += (o2, e2) =>
+                                                {
+                                                    ntfRecSaveFileDialog.DefaultExt = "share";
+                                                    ntfRecSaveFileDialog.Filter = "Share document (*.share)|*.share";
+                                                    ntfRecSaveFileDialog.AddExtension = true;
+                                                    DialogResult dr = ntfRecSaveFileDialog.ShowDialog();
+                                                    if (dr == DialogResult.OK)
+                                                    {
+                                                        string filename = ntfRecSaveFileDialog.FileName;
+                                                        File.WriteAllBytes(filename, message);
+                                                        MQHandler.Ack(DeliveryTag);
+                                                        ntfConfLabel1.Text = "You have saved " + sender + "'s share. Please delete it after use.";
+                                                        ntfConfButton2.Visible = false;
+                                                        ntfPanel.Controls.Remove(ntfButton);
+                                                        ntfButton.Dispose();
+                                                    }
+                                                };
+                                            }
+                                            else
+                                            {
+                                                ntfConfButton2.Visible = false;
+                                                MQHandler.Ack(DeliveryTag);
+                                                ntfPanel.Controls.Remove(ntfButton);
+                                                ntfButton.Dispose();
+                                            }
+                                            DatabaseHandler.Close();
+                                        }
+                                        catch (MySql.Data.MySqlClient.MySqlException ex)
+                                        {
+                                            Debug.WriteLine(ex.Number + " : " + ex.Message);
+                                            throw;
+                                        }
+                                    };
+                                    break;
+                                }
+                        }
                         break;
                     }
                 case "Update":
@@ -997,20 +1325,22 @@ namespace ProShare
             {
                 string[] shareFiles = cekOpenFileDialog.FileNames;
                 cekSaveFileDialog.ShowDialog();
-                string filename = cekSaveFileDialog.FileName;
-                try
+                DialogResult dr = ntfSaveFileDialog.ShowDialog();
+                if (dr == DialogResult.OK)
                 {
-                    DatabaseHandler.Connect();
-                    List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
-                    byte k = (byte)(ulong)schemeInfos[3];
-                    byte n = (byte)(ulong)schemeInfos[4];
-                    Debug.WriteLine(k + " & " + n);
-                    SecretSharing.ReconstructFileSecret(shareFiles, k, filename);
-                    //File.WriteAllBytes(filename, current_bytes);
-                }
-                catch (MySql.Data.MySqlClient.MySqlException ex)
-                {
-                    Debug.WriteLine(ex.Number + " " + ex.Message);
+                    try
+                    {
+                        DatabaseHandler.Connect();
+                        List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                        byte k = (byte)(ulong)schemeInfos[3];
+                        byte n = (byte)(ulong)schemeInfos[4];
+                        SecretSharing.ReconstructFileSecret(shareFiles, k, cekSaveFileDialog.FileName);
+                        //File.WriteAllBytes(filename, current_bytes);
+                    }
+                    catch (MySql.Data.MySqlClient.MySqlException ex)
+                    {
+                        Debug.WriteLine(ex.Number + " " + ex.Message);
+                    }
                 }
             }
         }
@@ -1036,6 +1366,11 @@ namespace ProShare
                 }
                 MQHandler.DeleteExchange(scheme);
             }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
