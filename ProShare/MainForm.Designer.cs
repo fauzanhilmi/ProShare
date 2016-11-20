@@ -37,6 +37,16 @@
             this.button1 = new System.Windows.Forms.Button();
             this.notificationsButton = new System.Windows.Forms.Button();
             this.operationsButton = new System.Windows.Forms.Button();
+            this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.browseOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.ntfSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.cekOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.cekSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ntfRecOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.recOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.recSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ntfRecSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ntfUpdOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.stackPanel = new ProShare.StackPanel();
             this.Operations = new System.Windows.Forms.TabPage();
             this.operationsTabControl = new System.Windows.Forms.TabControl();
@@ -74,9 +84,18 @@
             this.recSchemesComboBox = new System.Windows.Forms.ComboBox();
             this.recSendButton = new System.Windows.Forms.Button();
             this.udpateTabPage = new System.Windows.Forms.TabPage();
+            this.updGenerateGroupBox = new System.Windows.Forms.GroupBox();
+            this.updGenerateSubsharesTextBox = new System.Windows.Forms.TextBox();
+            this.updGenerateSusbharesBrowseButton = new System.Windows.Forms.Button();
+            this.updGenerateSchemeLabel = new System.Windows.Forms.Label();
+            this.updGenerateButton = new System.Windows.Forms.Button();
+            this.updGenerateSchemesComboBox = new System.Windows.Forms.ComboBox();
+            this.updGenerateShareTextBox = new System.Windows.Forms.TextBox();
+            this.updGenerateShareBrowseButton = new System.Windows.Forms.Button();
+            this.updSendGroupBox = new System.Windows.Forms.GroupBox();
+            this.updSchemeText = new System.Windows.Forms.Label();
             this.updSendButton = new System.Windows.Forms.Button();
-            this.updSchemeGroupBox = new System.Windows.Forms.GroupBox();
-            this.updSchemesComboBox = new System.Windows.Forms.ComboBox();
+            this.updSendSchemesComboBox = new System.Windows.Forms.ComboBox();
             this.Notifications = new System.Windows.Forms.TabPage();
             this.ntfTabControl = new System.Windows.Forms.TabControl();
             this.ntfTabPage = new System.Windows.Forms.TabPage();
@@ -97,15 +116,7 @@
             this.browseSecretFileTextBox = new System.Windows.Forms.TextBox();
             this.browseBrowseButton = new System.Windows.Forms.Button();
             this.Profile = new System.Windows.Forms.TabPage();
-            this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.browseOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.ntfSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.cekOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.cekSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.ntfRecOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.recOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.recSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.ntfRecSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ntfUpdSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -127,7 +138,8 @@
             this.recGenerateGroupBox.SuspendLayout();
             this.recSchemeGroupBox.SuspendLayout();
             this.udpateTabPage.SuspendLayout();
-            this.updSchemeGroupBox.SuspendLayout();
+            this.updGenerateGroupBox.SuspendLayout();
+            this.updSendGroupBox.SuspendLayout();
             this.Notifications.SuspendLayout();
             this.ntfTabControl.SuspendLayout();
             this.ntfTabPage.SuspendLayout();
@@ -243,6 +255,15 @@
             this.operationsButton.Text = "Operations";
             this.operationsButton.UseVisualStyleBackColor = true;
             this.operationsButton.Click += new System.EventHandler(this.operationsButton_Click);
+            // 
+            // ntfSaveFileDialog
+            // 
+            this.ntfSaveFileDialog.DefaultExt = "share";
+            this.ntfSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.ntfSaveFileDialog_FileOk);
+            // 
+            // cekOpenFileDialog
+            // 
+            this.cekOpenFileDialog.FileName = "cekOpenFileDialog";
             // 
             // stackPanel
             // 
@@ -644,8 +665,8 @@
             // 
             // udpateTabPage
             // 
-            this.udpateTabPage.Controls.Add(this.updSendButton);
-            this.udpateTabPage.Controls.Add(this.updSchemeGroupBox);
+            this.udpateTabPage.Controls.Add(this.updGenerateGroupBox);
+            this.udpateTabPage.Controls.Add(this.updSendGroupBox);
             this.udpateTabPage.Location = new System.Drawing.Point(4, 22);
             this.udpateTabPage.Name = "udpateTabPage";
             this.udpateTabPage.Size = new System.Drawing.Size(523, 475);
@@ -653,34 +674,122 @@
             this.udpateTabPage.Text = "Shares Update";
             this.udpateTabPage.UseVisualStyleBackColor = true;
             // 
+            // updGenerateGroupBox
+            // 
+            this.updGenerateGroupBox.Controls.Add(this.updGenerateSubsharesTextBox);
+            this.updGenerateGroupBox.Controls.Add(this.updGenerateSusbharesBrowseButton);
+            this.updGenerateGroupBox.Controls.Add(this.updGenerateSchemeLabel);
+            this.updGenerateGroupBox.Controls.Add(this.updGenerateButton);
+            this.updGenerateGroupBox.Controls.Add(this.updGenerateSchemesComboBox);
+            this.updGenerateGroupBox.Controls.Add(this.updGenerateShareTextBox);
+            this.updGenerateGroupBox.Controls.Add(this.updGenerateShareBrowseButton);
+            this.updGenerateGroupBox.Location = new System.Drawing.Point(-4, 152);
+            this.updGenerateGroupBox.Name = "updGenerateGroupBox";
+            this.updGenerateGroupBox.Size = new System.Drawing.Size(530, 204);
+            this.updGenerateGroupBox.TabIndex = 8;
+            this.updGenerateGroupBox.TabStop = false;
+            this.updGenerateGroupBox.Text = "Generate New Share";
+            // 
+            // updGenerateSubsharesTextBox
+            // 
+            this.updGenerateSubsharesTextBox.Location = new System.Drawing.Point(38, 114);
+            this.updGenerateSubsharesTextBox.Name = "updGenerateSubsharesTextBox";
+            this.updGenerateSubsharesTextBox.Size = new System.Drawing.Size(338, 20);
+            this.updGenerateSubsharesTextBox.TabIndex = 10;
+            this.updGenerateSubsharesTextBox.Text = "Select subshare files";
+            // 
+            // updGenerateSusbharesBrowseButton
+            // 
+            this.updGenerateSusbharesBrowseButton.Location = new System.Drawing.Point(382, 113);
+            this.updGenerateSusbharesBrowseButton.Name = "updGenerateSusbharesBrowseButton";
+            this.updGenerateSusbharesBrowseButton.Size = new System.Drawing.Size(77, 20);
+            this.updGenerateSusbharesBrowseButton.TabIndex = 11;
+            this.updGenerateSusbharesBrowseButton.Text = "Browse";
+            this.updGenerateSusbharesBrowseButton.UseVisualStyleBackColor = true;
+            // 
+            // updGenerateSchemeLabel
+            // 
+            this.updGenerateSchemeLabel.AutoSize = true;
+            this.updGenerateSchemeLabel.Location = new System.Drawing.Point(35, 41);
+            this.updGenerateSchemeLabel.Name = "updGenerateSchemeLabel";
+            this.updGenerateSchemeLabel.Size = new System.Drawing.Size(55, 13);
+            this.updGenerateSchemeLabel.TabIndex = 9;
+            this.updGenerateSchemeLabel.Text = "Scheme : ";
+            // 
+            // updGenerateButton
+            // 
+            this.updGenerateButton.Location = new System.Drawing.Point(382, 148);
+            this.updGenerateButton.Name = "updGenerateButton";
+            this.updGenerateButton.Size = new System.Drawing.Size(120, 41);
+            this.updGenerateButton.TabIndex = 7;
+            this.updGenerateButton.Text = "Generate Share";
+            this.updGenerateButton.UseVisualStyleBackColor = true;
+            // 
+            // updGenerateSchemesComboBox
+            // 
+            this.updGenerateSchemesComboBox.FormattingEnabled = true;
+            this.updGenerateSchemesComboBox.Location = new System.Drawing.Point(96, 38);
+            this.updGenerateSchemesComboBox.Name = "updGenerateSchemesComboBox";
+            this.updGenerateSchemesComboBox.Size = new System.Drawing.Size(324, 21);
+            this.updGenerateSchemesComboBox.TabIndex = 8;
+            this.updGenerateSchemesComboBox.Text = "You are not involved in any schemes";
+            // 
+            // updGenerateShareTextBox
+            // 
+            this.updGenerateShareTextBox.Location = new System.Drawing.Point(38, 79);
+            this.updGenerateShareTextBox.Name = "updGenerateShareTextBox";
+            this.updGenerateShareTextBox.Size = new System.Drawing.Size(338, 20);
+            this.updGenerateShareTextBox.TabIndex = 4;
+            this.updGenerateShareTextBox.Text = "Select your share file";
+            // 
+            // updGenerateShareBrowseButton
+            // 
+            this.updGenerateShareBrowseButton.Location = new System.Drawing.Point(382, 78);
+            this.updGenerateShareBrowseButton.Name = "updGenerateShareBrowseButton";
+            this.updGenerateShareBrowseButton.Size = new System.Drawing.Size(77, 20);
+            this.updGenerateShareBrowseButton.TabIndex = 5;
+            this.updGenerateShareBrowseButton.Text = "Browse";
+            this.updGenerateShareBrowseButton.UseVisualStyleBackColor = true;
+            // 
+            // updSendGroupBox
+            // 
+            this.updSendGroupBox.Controls.Add(this.updSchemeText);
+            this.updSendGroupBox.Controls.Add(this.updSendButton);
+            this.updSendGroupBox.Controls.Add(this.updSendSchemesComboBox);
+            this.updSendGroupBox.Location = new System.Drawing.Point(3, 3);
+            this.updSendGroupBox.Name = "updSendGroupBox";
+            this.updSendGroupBox.Size = new System.Drawing.Size(517, 102);
+            this.updSendGroupBox.TabIndex = 2;
+            this.updSendGroupBox.TabStop = false;
+            this.updSendGroupBox.Text = "Send Share Update Requests";
+            // 
+            // updSchemeText
+            // 
+            this.updSchemeText.AutoSize = true;
+            this.updSchemeText.Location = new System.Drawing.Point(28, 26);
+            this.updSchemeText.Name = "updSchemeText";
+            this.updSchemeText.Size = new System.Drawing.Size(55, 13);
+            this.updSchemeText.TabIndex = 8;
+            this.updSchemeText.Text = "Scheme : ";
+            // 
             // updSendButton
             // 
-            this.updSendButton.Location = new System.Drawing.Point(349, 76);
+            this.updSendButton.Location = new System.Drawing.Point(375, 50);
             this.updSendButton.Name = "updSendButton";
-            this.updSendButton.Size = new System.Drawing.Size(171, 44);
+            this.updSendButton.Size = new System.Drawing.Size(120, 40);
             this.updSendButton.TabIndex = 7;
-            this.updSendButton.Text = "Send Shares Update Requests";
+            this.updSendButton.Text = "Send Requests";
             this.updSendButton.UseVisualStyleBackColor = true;
             this.updSendButton.Click += new System.EventHandler(this.updSendButton_Click);
             // 
-            // updSchemeGroupBox
+            // updSendSchemesComboBox
             // 
-            this.updSchemeGroupBox.Controls.Add(this.updSchemesComboBox);
-            this.updSchemeGroupBox.Location = new System.Drawing.Point(3, 3);
-            this.updSchemeGroupBox.Name = "updSchemeGroupBox";
-            this.updSchemeGroupBox.Size = new System.Drawing.Size(517, 67);
-            this.updSchemeGroupBox.TabIndex = 2;
-            this.updSchemeGroupBox.TabStop = false;
-            this.updSchemeGroupBox.Text = "Specify scheme";
-            // 
-            // updSchemesComboBox
-            // 
-            this.updSchemesComboBox.FormattingEnabled = true;
-            this.updSchemesComboBox.Location = new System.Drawing.Point(88, 23);
-            this.updSchemesComboBox.Name = "updSchemesComboBox";
-            this.updSchemesComboBox.Size = new System.Drawing.Size(325, 21);
-            this.updSchemesComboBox.TabIndex = 1;
-            this.updSchemesComboBox.Text = "You are not involved in any schemes";
+            this.updSendSchemesComboBox.FormattingEnabled = true;
+            this.updSendSchemesComboBox.Location = new System.Drawing.Point(88, 23);
+            this.updSendSchemesComboBox.Name = "updSendSchemesComboBox";
+            this.updSendSchemesComboBox.Size = new System.Drawing.Size(325, 21);
+            this.updSendSchemesComboBox.TabIndex = 1;
+            this.updSendSchemesComboBox.Text = "You are not involved in any schemes";
             // 
             // Notifications
             // 
@@ -888,15 +997,6 @@
             this.Profile.TabIndex = 1;
             this.Profile.Text = "Profile";
             // 
-            // ntfSaveFileDialog
-            // 
-            this.ntfSaveFileDialog.DefaultExt = "share";
-            this.ntfSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.ntfSaveFileDialog_FileOk);
-            // 
-            // cekOpenFileDialog
-            // 
-            this.cekOpenFileDialog.FileName = "cekOpenFileDialog";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -935,7 +1035,10 @@
             this.recSchemeGroupBox.ResumeLayout(false);
             this.recSchemeGroupBox.PerformLayout();
             this.udpateTabPage.ResumeLayout(false);
-            this.updSchemeGroupBox.ResumeLayout(false);
+            this.updGenerateGroupBox.ResumeLayout(false);
+            this.updGenerateGroupBox.PerformLayout();
+            this.updSendGroupBox.ResumeLayout(false);
+            this.updSendGroupBox.PerformLayout();
             this.Notifications.ResumeLayout(false);
             this.ntfTabControl.ResumeLayout(false);
             this.ntfTabPage.ResumeLayout(false);
@@ -1015,10 +1118,10 @@
         private System.Windows.Forms.Button deleteButton;
         private System.Windows.Forms.GroupBox recSchemeGroupBox;
         private System.Windows.Forms.Button recSendButton;
-        private System.Windows.Forms.GroupBox updSchemeGroupBox;
+        private System.Windows.Forms.GroupBox updSendGroupBox;
         private System.Windows.Forms.Button updSendButton;
         private System.Windows.Forms.ComboBox recSchemesComboBox;
-        private System.Windows.Forms.ComboBox updSchemesComboBox;
+        private System.Windows.Forms.ComboBox updSendSchemesComboBox;
         private System.Windows.Forms.OpenFileDialog ntfRecOpenFileDialog;
         private System.Windows.Forms.GroupBox recGenerateGroupBox;
         private System.Windows.Forms.Button recGenerateButton;
@@ -1030,5 +1133,16 @@
         private System.Windows.Forms.OpenFileDialog recOpenFileDialog;
         private System.Windows.Forms.SaveFileDialog recSaveFileDialog;
         private System.Windows.Forms.SaveFileDialog ntfRecSaveFileDialog;
+        private System.Windows.Forms.OpenFileDialog ntfUpdOpenFileDialog;
+        private System.Windows.Forms.GroupBox updGenerateGroupBox;
+        private System.Windows.Forms.Label updGenerateSchemeLabel;
+        private System.Windows.Forms.Button updGenerateButton;
+        private System.Windows.Forms.ComboBox updGenerateSchemesComboBox;
+        private System.Windows.Forms.TextBox updGenerateShareTextBox;
+        private System.Windows.Forms.Button updGenerateShareBrowseButton;
+        private System.Windows.Forms.Label updSchemeText;
+        private System.Windows.Forms.TextBox updGenerateSubsharesTextBox;
+        private System.Windows.Forms.Button updGenerateSusbharesBrowseButton;
+        private System.Windows.Forms.SaveFileDialog ntfUpdSaveFileDialog;
     }
 }

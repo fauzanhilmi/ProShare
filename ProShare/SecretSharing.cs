@@ -341,6 +341,36 @@ namespace ProShare
             return subshares;
         }
 
+        //generates list of subshares from one player
+        public static byte[] GenerateByteSubshares(byte k, byte n)
+        {
+            if (k == 0 || n == 0)
+            {
+                throw new System.ArgumentException("k and n cannot be 0", "k and n");
+            }
+            if (k > n)
+            {
+                throw new System.ArgumentException("k must be less or equal than n", "k and n");
+            }
+
+            //Generates array of absissca (x) from 1 to n
+            Field[] XArr = new Field[n];
+            for(byte i=0; i<n; i++)
+            {
+                XArr[i] = (Field)(i + 1);
+            }
+
+            //Generates byte[] of subshare
+            Field[] subshare = GenerateSubshares(XArr, k);
+            byte[] subshareBytes = new byte[subshare.Length];
+            for(int i=0; i<subshareBytes.Length; i++)
+            {
+                subshareBytes[i] = (byte)subshare[i];
+            }
+
+            return subshareBytes;
+        }
+
         /* Generates new share for a player according to his/her old share (CurShare) and list of subshare (subshares) from other players */
         private static Share GenerateNewShare(Share CurShare, Field[] subshares)
         {
@@ -360,7 +390,7 @@ namespace ProShare
 
         /* Generates new file share according to his/her old share file in OldShareLocation and a list of subshare (subshares) from other players
          * writes the new file share in NewShareLocation */
-        //TODO : Handle file I/O exceptions
+        //kalo perlu, bikin method baru yg nerima dan output byte[]
         public static void GenerateNewFileShare(string OldShareLocation, Field[] subshares, string NewShareLocation)
         {
             if (subshares.Length == 0)

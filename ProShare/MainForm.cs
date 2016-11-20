@@ -25,29 +25,35 @@ namespace ProShare
         private delegate void AddNtfButtonCallback(ulong DeliveryTag, IDictionary<string, object> contents);
 
         /*      GENERATE attributes         */
-        private string genEmptyName = "Enter a name";
-        private string genEmptyText = "Enter a text here...";
-        private string genEmptyFile = "Select a file";
-        private string genPlayersCount1 = "Add ";
-        private string genPlayersCount2 = " players";
+        private const string genEmptyName = "Enter a name";
+        private const string genEmptyText = "Enter a text here...";
+        private const string genEmptyFile = "Select a file";
+        private const string genPlayersCount1 = "Add ";
+        private const string genPlayersCount2 = " players";
         private string genEmptyPlayer;
-        private string genEmptyPlayer1 = "Enter an username (e.g., ";
-        private string genEmptyPlayer2 = ")";
-        private string genFirstStatus = "Sending share requests...";
+        private const string genEmptyPlayer1 = "Enter an username (e.g., ";
+        private const string genEmptyPlayer2 = ")";
+        private const string genFirstStatus = "Sending share requests...";
 
         /*      RECONSTRUCT attributes      */
-        private string recEmptySchemeText = "You are not involved in any scheme";
-        private string recEmptyFile = "Select a file";
+        private const string recEmptySchemeText = "You are not involved in any scheme";
+        private const string recEmptyFile = "Select a file";
         private string[] recShareFiles;
 
+        /*      UPDATE attributes           */
+        private const string updEmptySchemeText = "You are not involved in any scheme(s)";
+        private const string updEmptyShare = "Select a share file";
+        private const string updEmptySubshare = "Select subhsare files";
+
         /*      Notifications attributes         */
-        private int numOfNotifications = 0;
-        private string browseEmptyText = "Enter a text...";
-        private string browseEmptyFile = "Select files";
+        private const int numOfNotifications = 0;
+        private const string browseEmptyText = "Enter a text...";
+        private const string browseEmptyFile = "Select files";
         //private byte[] current_bytes;
         //private byte current_k; //for Generate - Dealer
         //private byte current_n;
         //private string ntftText = "Notifications (";
+
 
         /*      TEST attributes                  */
         //private string current_scheme;
@@ -190,25 +196,22 @@ namespace ProShare
 
                         if (schemes.Count == 0)
                         {
-                            //recSchemesComboBox.Text = recEmptySchemeText;
-                            //recSendButton.Enabled = false;
-                            //recSchemesComboBox2.Text = recEmptySchemeText;
-                            //recGenerateButton.Enabled = false;
-
+                            updSendSchemesComboBox.Text = updEmptySchemeText;
+                            updSendButton.Enabled = false;
+                            updGenerateSchemesComboBox.Text = updEmptySchemeText;
+                            updGenerateButton.Enabled = false;
                         }
                         else
                         {
                             BindingSource bs = new BindingSource();
                             bs.DataSource = schemes;
-                            recSchemesComboBox.DataSource = bs;
-                            recSendButton.Enabled = true;
+                            updSendSchemesComboBox.DataSource = bs;
+                            updSendButton.Enabled = true;
                             BindingSource bs2 = new BindingSource();
                             bs2.DataSource = schemes;
-                            recSchemesComboBox2.DataSource = bs2;
-                            recGenerateButton.Enabled = true;
+                            updGenerateSchemesComboBox.DataSource = bs;
+                            updGenerateButton.Enabled = true;
                         }
-
-
                         break;
                     }
             }
@@ -610,6 +613,27 @@ namespace ProShare
         /*          UPDATE methods                  */
         private void updSendButton_Click(object sender, EventArgs e)
         {
+            if(updSendSchemesComboBox.Text == updEmptySchemeText)
+            {
+                //do nothing
+            }
+            else
+            {
+                string scheme = updSendSchemesComboBox.Text;
+                try
+                {
+                    DatabaseHandler.Connect();
+                    DatabaseHandler.ResetConfirmations(scheme);
+                    DatabaseHandler.Close();
+
+                    MQHandler.SendFanoutMessages("Update", "Request", scheme, username, ASCIIEncoding.ASCII.GetBytes(""));
+                    MessageBox.Show("Update requests delivery is completed", "Delivery Succeed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (MySql.Data.MySqlClient.MySqlException ex)
+                {
+                    MessageBox.Show(ex.Message, "Unexpected " + ex.Number + " Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
 
         }
 
@@ -1021,6 +1045,7 @@ namespace ProShare
 
                                                     DatabaseHandler.Connect();
                                                     List<string> players = DatabaseHandler.GetPlayers(scheme);
+                                                    players.Sort();
 
                                                     byte idx = 0;
                                                     foreach (string player in players)
@@ -1260,6 +1285,270 @@ namespace ProShare
                     }
                 case "Update":
                     {
+                        switch(type)
+                        {
+                            case "Request":
+                                {
+                                    ntfButton.Text = "[" + scheme + "] " + sender + " requests shares update";
+                                    ntfButton.Click += (o, e) =>
+                                    {
+                                        ntfActionStackPanel.SelectTab(0); //Action
+                                        ntfConfLabel1.Text = sender + " has requested shares update on scheme '" + scheme + "'";
+                                        ntfConfLabel1.Visible = true;
+                                        ntfConfLabel2.Text = "If you approved this request, click 'Confirm'. Otherwise, click 'Reject'";
+                                        ntfConfLabel2.Visible = true;
+
+                                        ntfConfButton1.Text = "Confirm";
+                                        ntfConfButton1.Visible = true;
+                                        RemoveClickEvent(ntfConfButton1);
+                                        ntfConfButton1.Click += (o1, e1) =>
+                                        {
+                                            try
+                                            {
+                                                DatabaseHandler.Connect();
+                                                DatabaseHandler.IncrementConfirmations(scheme);
+
+                                                MQHandler.SendDirectMessage("Update", "Response", scheme, username, sender, BitConverter.GetBytes(true)); //here sender = destination!
+
+                                                List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                                                string dealer = (string)schemeInfos[2];
+                                                ulong n = (ulong)schemeInfos[4];
+                                                ulong num_of_confirmations = (ulong)schemeInfos[5];
+                                                //Send notifications if all players have been accepted
+                                                if (num_of_confirmations == n)
+                                                {
+                                                    MQHandler.SendFanoutMessages("Update", "Notice", scheme, dealer, BitConverter.GetBytes(true));
+                                                    //Handle dealer ga???
+                                                    //MQHandler.SendDirectMessage("Update", "Dealer", scheme, "System", dealer, ASCIIEncoding.ASCII.GetBytes("")); //send special request to dealer
+                                                }
+
+                                                ntfConfLabel2.Text = "You approved this request.";
+                                                ntfConfButton1.Visible = false;
+                                                ntfConfButton2.Visible = false;
+                                                MQHandler.Ack(DeliveryTag);
+                                                ntfPanel.Controls.Remove(ntfButton);
+                                                ntfButton.Dispose();
+                                                DatabaseHandler.Close();
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Debug.WriteLine(ex.Message);
+                                            };
+                                        };
+
+                                        ntfConfButton2.Text = "Reject";
+                                        ntfConfButton2.Visible = true;
+                                        RemoveClickEvent(ntfConfButton2);
+                                        ntfConfButton2.Click += (o2, e2) =>
+                                        {
+                                            try
+                                            {
+                                                DatabaseHandler.Connect();
+                                                DatabaseHandler.IncrementConfirmations(scheme);
+
+                                                MQHandler.SendDirectMessage("Update", "Response", scheme, username, sender, BitConverter.GetBytes(false)); //here sender = destination!
+
+                                                List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                                                string dealer = (string)schemeInfos[2];
+                                                ulong n = (ulong)schemeInfos[4];
+                                                ulong num_of_confirmations = (ulong)schemeInfos[5];
+                                                //Send notifications if all players have been accepted
+                                                MQHandler.SendFanoutMessages("Update", "Notice", scheme, "System", BitConverter.GetBytes(false));
+                                                //send ke dealer juga ga?
+
+                                                ntfConfLabel2.Text = "You rejected this request.";
+                                                ntfConfButton1.Visible = false;
+                                                ntfConfButton2.Visible = false;
+                                                MQHandler.Ack(DeliveryTag);
+                                                ntfPanel.Controls.Remove(ntfButton);
+                                                ntfButton.Dispose();
+                                                DatabaseHandler.Close();
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Debug.WriteLine(ex.Message);
+                                            };
+                                        };
+                                    };
+                                    break;
+                                }
+                            case "Response":
+                                {
+                                    bool isAccepted = BitConverter.ToBoolean(message, 0);
+                                    string response = "";
+                                    if (isAccepted)
+                                    {
+                                        response = "accepted";
+                                    }
+                                    else
+                                    {
+                                        response = "rejected"; ;
+                                    }
+
+                                    ntfButton.Text = "[" + scheme + "] " + sender + " " + response + " your shares update request";
+                                    ntfButton.Click += (o, e) =>
+                                    {
+                                        ntfActionStackPanel.SelectTab(0); //Action
+                                        ntfConfLabel1.Text = sender + " has " + response + " your request update the shares.";
+                                        ntfConfLabel1.Visible = true;
+                                        if (isAccepted)
+                                        {
+                                            try
+                                            {
+                                                DatabaseHandler.Connect();
+                                                List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                                                ulong n = (ulong)schemeInfos[4];
+                                                ulong num_of_confirmations = (ulong)schemeInfos[5];
+                                                ntfConfLabel2.Text = "Number of confirmations so far : " + num_of_confirmations + "/" + n;
+                                                ntfConfLabel2.Visible = true;
+                                                DatabaseHandler.Close();
+                                            }
+                                            catch (MySql.Data.MySqlClient.MySqlException ex)
+                                            {
+                                                Debug.WriteLine("Something goes wrong on Database");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ntfConfLabel2.Text = "This means the shares update operation is failed.";
+                                            ntfConfLabel2.Visible = true;
+                                        }
+                                        ntfConfButton1.Visible = false;
+                                        ntfConfButton2.Visible = false;
+                                        MQHandler.Ack(DeliveryTag);
+                                        ntfPanel.Controls.Remove(ntfButton);
+                                        ntfButton.Dispose();
+                                    };
+                                    break;
+                                }
+                            case "Notice":
+                                {
+                                    bool isAccepted = BitConverter.ToBoolean(message, 0);
+                                    string bText, label1Text, label2Text;
+                                    if(isAccepted)
+                                    {
+                                        bText = "[" + scheme + "] " + " Update share operation advances to next step";
+                                        label1Text = "Good news, all players have approved the update share request!";
+                                        label2Text = "Now, please click the button below to generate and send subshares to all players.";
+                                    }
+                                    else
+                                    {
+                                        bText = "[" + scheme + "] " + " Update share operation is failed";
+                                        label1Text = "Bad news, a player has rejected the update share request.";
+                                        label2Text = "Thus, the update operation is failed and will not be processed further.";
+                                    }
+
+                                    ntfButton.Text = bText;
+                                    ntfButton.Click += (o, e) =>
+                                    {
+                                        ntfActionStackPanel.SelectTab(0); //Action
+                                        ntfConfLabel1.Text = label1Text;
+                                        ntfConfLabel1.Visible = true;
+                                        ntfConfLabel2.Text = label2Text;
+                                        ntfConfLabel2.Visible = true;
+
+                                        if(isAccepted)
+                                        {
+                                            ntfConfButton1.Visible = false;
+                                            ntfConfButton2.Text = "Send Subshares";
+                                            ntfConfButton2.Visible = true;
+
+                                            RemoveClickEvent(ntfConfButton2);
+                                            ntfConfButton2.Click += (o2, e2) =>
+                                            {
+                                                /*ntfUpdOpenFileDialog.DefaultExt = "share";
+                                                ntfUpdOpenFileDialog.Filter = "Share document (*.share)|*.share";
+                                                ntfUpdOpenFileDialog.AddExtension = true;
+                                                DialogResult dr = ntfUpdOpenFileDialog.ShowDialog();
+                                                if(dr == DialogResult.OK)
+                                                {
+                                                    //lanjut sini!!
+                                                    string shareFile = ntfUpdOpenFileDialog.FileName;
+                                                    
+                                                    ntfConfLabel2.Text = "Subshares from share file '" + Path.GetFileName(shareFile) + "' have been generated. Click 'Send' to send them to other players.";
+                                                    ntfConfButton2.Enabled = true;
+                                                    ntfConfButton2.Click += (o2, e2) =>
+                                                    {
+                                                        //lanjut kk
+                                                    };
+                                                }*/
+
+                                                try
+                                                {
+                                                    DatabaseHandler.Connect();
+                                                    List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                                                    DatabaseHandler.Close();
+                                                    byte k = (byte)(ulong)schemeInfos[3];
+                                                    byte n = (byte)(ulong)schemeInfos[4];
+                                                    DatabaseHandler.Connect();
+                                                    List<string> players = DatabaseHandler.GetPlayers(scheme);
+                                                    players.Sort();
+                                                    DatabaseHandler.Close();
+
+                                                    byte[] subshares = SecretSharing.GenerateByteSubshares(k, n);
+                                                    Debug.Assert(players.Count == subshares.Length);
+                                                    for(int i=0; i<players.Count; i++)
+                                                    {
+                                                        byte[] curByte = new byte[1];
+                                                        curByte[0] = subshares[i];
+                                                        MQHandler.SendDirectMessage("Update", "Subshare", scheme, username, players[i], curByte);
+                                                    }
+                                                    DatabaseHandler.Close();
+
+                                                    MessageBox.Show("All subshares have been sent to all players", "Delivery Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                    MQHandler.Ack(DeliveryTag);
+                                                    ntfPanel.Controls.Remove(ntfButton);
+                                                    ntfButton.Dispose();
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Debug.WriteLine(ex.Message);
+                                                }
+                                            };
+                                        }
+                                        else
+                                        {
+                                            ntfConfButton1.Visible = false;
+                                            ntfConfButton2.Visible = false;
+                                            MQHandler.Ack(DeliveryTag);
+                                            ntfPanel.Controls.Remove(ntfButton);
+                                            ntfButton.Dispose();
+                                        }
+                                    };
+                                    break;
+                                }
+                            case "Subshare":
+                                {
+                                    ntfButton.Text = "[" + scheme + "] " + sender + " sent you a subshare";
+                                    ntfButton.Click += (o, e) =>
+                                    {
+                                        ntfActionStackPanel.SelectTab(0); //Action
+                                        ntfConfLabel1.Text = sender + " has sent you a subshare for share update on scheme '" + scheme + "'";
+                                        ntfConfLabel1.Visible = true;
+                                        //TODO : tampilin jumlah yg udah ngirim
+                                        ntfConfLabel2.Text = "Click 'Save' to save the subshare to your disk";
+                                        ntfConfLabel2.Visible = true;
+
+                                        ntfConfButton1.Visible = false;
+                                        ntfConfButton2.Text = "Save";
+                                        ntfConfButton2.Visible = true;
+                                        RemoveClickEvent(ntfConfButton2);
+                                        ntfConfButton2.Click += (o2, e2) =>
+                                        {
+                                            ntfUpdSaveFileDialog.DefaultExt = "subshare";
+                                            ntfUpdSaveFileDialog.Filter = "Subhare document (*.subshare)|*.subshare";
+                                            ntfUpdSaveFileDialog.AddExtension = true;
+                                            DialogResult dr = ntfUpdSaveFileDialog.ShowDialog();
+                                            if(dr == DialogResult.OK)
+                                            {
+                                                string filename = ntfUpdSaveFileDialog.FileName;
+                                                File.WriteAllBytes(filename, message);
+                                            }
+                                        };
+                                    };
+                                    break;
+                                }
+                        }
                         break;
                     }
                 default:
