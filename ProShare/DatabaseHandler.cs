@@ -13,10 +13,15 @@ namespace ProShare
 {
     public static class DatabaseHandler
     {
-        private static string server = "127.0.0.1";
-        private static string uid = "root";
-        private static string pwd = "";
-        private static string db = "ProShare";
+        private static string localServer = "127.0.0.1";
+        private static string localUid = "root";
+        private static string localPwd = "";
+        private static string localDb = "ProShare";
+
+        private static string remoteServer = "128.199.217.88";
+        private static string remoteUid = "proshare";
+        private static string remotePwd = "proshare";
+        private static string remoteDb = "ProShare";
 
         private static string macAddress;
         private static MySql.Data.MySqlClient.MySqlConnection SqlConn;
@@ -53,9 +58,22 @@ namespace ProShare
         /* Connect to MySQL server */
         public static void Connect()
         {
+            string SqlConnString = "";
+            //GANTI ENVIRONMENT DISINI
+            string env = "local";
+            if (env == "remote")
+            {
+                SqlConnString = "server=" + remoteServer + ";uid=" + remoteUid + ";pwd=" + remotePwd + ";database=" + remoteDb;
+                Debug.WriteLine("Hai");
+            }
+            else if(env == "local")
+            {
+                SqlConnString = "server=" + localServer + ";uid=" + localUid + ";pwd=" + localPwd + ";database=" + localDb;
+            }
+
             try
             {
-                string SqlConnString = "server=" + server + ";uid=" + uid + ";pwd=" + pwd + ";database=" + db;
+                //string SqlConnString = "server=" + server + ";uid=" + uid + ";pwd=" + pwd + ";database=" + db;
                 SqlConn = new MySql.Data.MySqlClient.MySqlConnection(SqlConnString);
                 SqlConn.Open();
             }

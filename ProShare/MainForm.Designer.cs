@@ -37,16 +37,6 @@
             this.button1 = new System.Windows.Forms.Button();
             this.notificationsButton = new System.Windows.Forms.Button();
             this.operationsButton = new System.Windows.Forms.Button();
-            this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.browseOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.ntfSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.cekOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.cekSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.ntfRecOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.recOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.recSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.ntfRecSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.ntfUpdOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.stackPanel = new ProShare.StackPanel();
             this.Operations = new System.Windows.Forms.TabPage();
             this.operationsTabControl = new System.Windows.Forms.TabControl();
@@ -86,7 +76,7 @@
             this.udpateTabPage = new System.Windows.Forms.TabPage();
             this.updGenerateGroupBox = new System.Windows.Forms.GroupBox();
             this.updGenerateSubsharesTextBox = new System.Windows.Forms.TextBox();
-            this.updGenerateSusbharesBrowseButton = new System.Windows.Forms.Button();
+            this.updGenerateSubharesBrowseButton = new System.Windows.Forms.Button();
             this.updGenerateSchemeLabel = new System.Windows.Forms.Label();
             this.updGenerateButton = new System.Windows.Forms.Button();
             this.updGenerateSchemesComboBox = new System.Windows.Forms.ComboBox();
@@ -116,7 +106,20 @@
             this.browseSecretFileTextBox = new System.Windows.Forms.TextBox();
             this.browseBrowseButton = new System.Windows.Forms.Button();
             this.Profile = new System.Windows.Forms.TabPage();
+            this.genOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.browseOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.ntfSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.cekOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.cekSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ntfRecOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.recOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.recSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ntfRecSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ntfUpdOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.ntfUpdSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.updGenerateShareOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.updGenerateSubsharesOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.updSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -255,15 +258,6 @@
             this.operationsButton.Text = "Operations";
             this.operationsButton.UseVisualStyleBackColor = true;
             this.operationsButton.Click += new System.EventHandler(this.operationsButton_Click);
-            // 
-            // ntfSaveFileDialog
-            // 
-            this.ntfSaveFileDialog.DefaultExt = "share";
-            this.ntfSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.ntfSaveFileDialog_FileOk);
-            // 
-            // cekOpenFileDialog
-            // 
-            this.cekOpenFileDialog.FileName = "cekOpenFileDialog";
             // 
             // stackPanel
             // 
@@ -677,7 +671,7 @@
             // updGenerateGroupBox
             // 
             this.updGenerateGroupBox.Controls.Add(this.updGenerateSubsharesTextBox);
-            this.updGenerateGroupBox.Controls.Add(this.updGenerateSusbharesBrowseButton);
+            this.updGenerateGroupBox.Controls.Add(this.updGenerateSubharesBrowseButton);
             this.updGenerateGroupBox.Controls.Add(this.updGenerateSchemeLabel);
             this.updGenerateGroupBox.Controls.Add(this.updGenerateButton);
             this.updGenerateGroupBox.Controls.Add(this.updGenerateSchemesComboBox);
@@ -698,14 +692,15 @@
             this.updGenerateSubsharesTextBox.TabIndex = 10;
             this.updGenerateSubsharesTextBox.Text = "Select subshare files";
             // 
-            // updGenerateSusbharesBrowseButton
+            // updGenerateSubharesBrowseButton
             // 
-            this.updGenerateSusbharesBrowseButton.Location = new System.Drawing.Point(382, 113);
-            this.updGenerateSusbharesBrowseButton.Name = "updGenerateSusbharesBrowseButton";
-            this.updGenerateSusbharesBrowseButton.Size = new System.Drawing.Size(77, 20);
-            this.updGenerateSusbharesBrowseButton.TabIndex = 11;
-            this.updGenerateSusbharesBrowseButton.Text = "Browse";
-            this.updGenerateSusbharesBrowseButton.UseVisualStyleBackColor = true;
+            this.updGenerateSubharesBrowseButton.Location = new System.Drawing.Point(382, 113);
+            this.updGenerateSubharesBrowseButton.Name = "updGenerateSubharesBrowseButton";
+            this.updGenerateSubharesBrowseButton.Size = new System.Drawing.Size(77, 20);
+            this.updGenerateSubharesBrowseButton.TabIndex = 11;
+            this.updGenerateSubharesBrowseButton.Text = "Browse";
+            this.updGenerateSubharesBrowseButton.UseVisualStyleBackColor = true;
+            this.updGenerateSubharesBrowseButton.Click += new System.EventHandler(this.updGenerateSusbharesBrowseButton_Click);
             // 
             // updGenerateSchemeLabel
             // 
@@ -724,6 +719,7 @@
             this.updGenerateButton.TabIndex = 7;
             this.updGenerateButton.Text = "Generate Share";
             this.updGenerateButton.UseVisualStyleBackColor = true;
+            this.updGenerateButton.Click += new System.EventHandler(this.updGenerateButton_Click);
             // 
             // updGenerateSchemesComboBox
             // 
@@ -750,6 +746,7 @@
             this.updGenerateShareBrowseButton.TabIndex = 5;
             this.updGenerateShareBrowseButton.Text = "Browse";
             this.updGenerateShareBrowseButton.UseVisualStyleBackColor = true;
+            this.updGenerateShareBrowseButton.Click += new System.EventHandler(this.updGenerateShareBrowseButton_Click);
             // 
             // updSendGroupBox
             // 
@@ -997,6 +994,15 @@
             this.Profile.TabIndex = 1;
             this.Profile.Text = "Profile";
             // 
+            // ntfSaveFileDialog
+            // 
+            this.ntfSaveFileDialog.DefaultExt = "share";
+            this.ntfSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.ntfSaveFileDialog_FileOk);
+            // 
+            // cekOpenFileDialog
+            // 
+            this.cekOpenFileDialog.FileName = "cekOpenFileDialog";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1142,7 +1148,10 @@
         private System.Windows.Forms.Button updGenerateShareBrowseButton;
         private System.Windows.Forms.Label updSchemeText;
         private System.Windows.Forms.TextBox updGenerateSubsharesTextBox;
-        private System.Windows.Forms.Button updGenerateSusbharesBrowseButton;
+        private System.Windows.Forms.Button updGenerateSubharesBrowseButton;
         private System.Windows.Forms.SaveFileDialog ntfUpdSaveFileDialog;
+        private System.Windows.Forms.OpenFileDialog updGenerateShareOpenFileDialog;
+        private System.Windows.Forms.OpenFileDialog updGenerateSubsharesOpenFileDialog;
+        private System.Windows.Forms.SaveFileDialog updSaveFileDialog;
     }
 }

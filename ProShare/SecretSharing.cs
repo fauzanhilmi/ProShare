@@ -449,5 +449,55 @@ namespace ProShare
                 Console.WriteLine(e.ToString());
             }
         }
+
+        public static byte[] GenerateNewShareBytes(byte[] oldShareBytes, byte[] subshareBytes)
+        {
+            if (subshareBytes.Length == 0 || oldShareBytes.Length == 0)
+            {
+                throw new System.ArgumentException("Array subshares & oldsharebytes cannot be empty", "subshares");
+            }
+
+            Share[] oldShares = new Share[oldShareBytes.Length - 1];
+            byte X = 0;
+            for (int i=0; i<oldShareBytes.Length; i++)
+            {
+                if (i == 0)
+                {
+                    X = oldShareBytes[i];
+                }
+                else
+                {
+                    oldShares[i - 1] = new Share((Field)X, (Field)oldShareBytes[i]);
+                }
+            }
+
+            //generating new shares
+            Field[] subshares = new Field[subshareBytes.Length];
+            for(int i=0; i<subshares.Length; i++)
+            {
+                subshares[i] = (Field)subshareBytes[i];
+            }
+
+            Share[] newShares = new Share[oldShares.Length];
+            for (int i = 0; i < newShares.Length; i++)
+            {
+                newShares[i] = GenerateNewShare(oldShares[i], subshares);
+            }
+
+            byte[] newShareBytes = new byte[newShares.Length + 1];
+            for (int i = 0; i < newShareBytes.Length; i++)
+            {
+                if (i == 0)
+                {
+                    newShareBytes[i] = (byte)newShares[0].GetX();
+                }
+                else
+                {
+                    newShareBytes[i] = (byte)newShares[i - 1].GetY();
+                }
+            }
+
+            return newShareBytes;
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace ProShare
         private const string genEmptyText = "Enter a text here...";
         private const string genEmptyFile = "Select a file";
         private const string genPlayersCount1 = "Add ";
-        private const string genPlayersCount2 = " players";
+        private const string genPlayersCount2 = " participants";
         private string genEmptyPlayer;
         private const string genEmptyPlayer1 = "Enter an username (e.g., ";
         private const string genEmptyPlayer2 = ")";
@@ -42,8 +42,10 @@ namespace ProShare
 
         /*      UPDATE attributes           */
         private const string updEmptySchemeText = "You are not involved in any scheme(s)";
-        private const string updEmptyShare = "Select a share file";
-        private const string updEmptySubshare = "Select subhsare files";
+        private const string updEmptyShare = "Select your share file";
+        private const string updEmptySubshare = "Select subshare files";
+        private string updShareFile;
+        private string[] updSubshareFiles;
 
         /*      Notifications attributes         */
         private const int numOfNotifications = 0;
@@ -127,6 +129,11 @@ namespace ProShare
             genDontCloseLabel.Visible = false;
             genShareButton.Enabled = false;
 
+            /*              UPDATE initializations                  */
+            updGenerateSchemesComboBox.Text = updEmptySchemeText;
+            updGenerateShareTextBox.Text = updEmptyShare;
+            updGenerateSubsharesTextBox.Text = updEmptySubshare;
+
             /*              Notification initializations            */
             ntfPanel.AutoScroll = true;
             ntfConfLabel1.Visible = false;
@@ -135,6 +142,7 @@ namespace ProShare
             ntfConfButton2.Visible = false;
             browseSecretTextBox.Text = browseEmptyText;
             browseGenerateButton.Enabled = true;
+
         }
 
         private void OperationsTabControl_SelectedIndexChanged(object sender, EventArgs e)
@@ -198,6 +206,8 @@ namespace ProShare
                         {
                             updSendSchemesComboBox.Text = updEmptySchemeText;
                             updSendButton.Enabled = false;
+                            updGenerateShareBrowseButton.Enabled = false;
+                            updGenerateSubharesBrowseButton.Enabled = false;
                             updGenerateSchemesComboBox.Text = updEmptySchemeText;
                             updGenerateButton.Enabled = false;
                         }
@@ -207,10 +217,12 @@ namespace ProShare
                             bs.DataSource = schemes;
                             updSendSchemesComboBox.DataSource = bs;
                             updSendButton.Enabled = true;
+                            updGenerateShareBrowseButton.Enabled = true;
+                            updGenerateSubharesBrowseButton.Enabled = true;
                             BindingSource bs2 = new BindingSource();
                             bs2.DataSource = schemes;
                             updGenerateSchemesComboBox.DataSource = bs;
-                            updGenerateButton.Enabled = true;
+                            updGenerateButton.Enabled = false;
                         }
                         break;
                     }
@@ -412,14 +424,14 @@ namespace ProShare
         {
             if (String.IsNullOrWhiteSpace(genPlayerTextBox.Text) || genPlayerTextBox.Text == genEmptyPlayer)
             {
-                MessageBox.Show("You typed empty username", "Cannot Add Player", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("You typed empty username", "Cannot Add Participant", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             else
             {
                 int index = genPlayersListBox.FindStringExact(genPlayerTextBox.Text);
-                if(index != -1) //player is already added
+                if(index != -1) //participant is already added
                 {
-                    MessageBox.Show("You have already added this username", "Cannot Add Player", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("You have already added this username", "Cannot Add Participant", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 else
                 {
@@ -514,7 +526,7 @@ namespace ProShare
                     }
                     else if(checkRes == 0) //One or more player does not exist
                     {
-                        MessageBox.Show("A player's name(s) does not exist. Please check it again.", "Share Requests Delivery Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("A participant's name(s) does not exist. Please check it again.", "Share Requests Delivery Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }                    
                     //else catch exception
                 }
@@ -637,6 +649,70 @@ namespace ProShare
 
         }
 
+        private void updGenerateShareBrowseButton_Click(object sender, EventArgs e)
+        {
+            updGenerateShareOpenFileDialog.DefaultExt = "share";
+            updGenerateShareOpenFileDialog.Filter = "Share document (*.share)|*.share";
+            updGenerateShareOpenFileDialog.AddExtension = true;
+            DialogResult dr = updGenerateShareOpenFileDialog.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+                updShareFile = updGenerateShareOpenFileDialog.FileName;
+                updGenerateShareTextBox.Text = Path.GetFileName(updShareFile);
+                if (updGenerateSubsharesTextBox.Text != updEmptySubshare)
+                {
+                    updGenerateButton.Enabled = true;
+                }                
+            }
+        }
+
+        private void updGenerateSusbharesBrowseButton_Click(object sender, EventArgs e)
+        {
+            updGenerateSubsharesOpenFileDialog.DefaultExt = "subshare";
+            updGenerateSubsharesOpenFileDialog.Filter = "Subhare document (*.subshare)|*.subshare";
+            updGenerateSubsharesOpenFileDialog.AddExtension = true;
+            updGenerateSubsharesOpenFileDialog.Multiselect = true;
+            DialogResult dr = updGenerateSubsharesOpenFileDialog.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+                string[] filenames = updGenerateSubsharesOpenFileDialog.FileNames;
+                updSubshareFiles = filenames;
+                string oneline = "";
+                foreach (string file in filenames)
+                {
+                    string current = "\"" + Path.GetFileName(file) + "\"";
+                    oneline += current;
+                }
+                updGenerateSubsharesTextBox.Text = oneline;
+                if (updGenerateShareTextBox.Text != updEmptyShare)
+                {
+                    updGenerateButton.Enabled = true;
+                }
+            }
+        }
+
+        private void updGenerateButton_Click(object sender, EventArgs e)
+        {
+            updSaveFileDialog.DefaultExt = "share";
+            updSaveFileDialog.Filter = "Share document (*.share)|*.share";
+            updSaveFileDialog.AddExtension = true;
+            DialogResult dr = updSaveFileDialog.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+                //ganti method read byte??
+                byte[] oldShareBytes = File.ReadAllBytes(updShareFile);
+                byte[] subshareBytes = new byte[updSubshareFiles.Length];
+                for (int i = 0; i < updSubshareFiles.Length; i++)
+                {
+                    byte[] curBytes = File.ReadAllBytes(updSubshareFiles[i]);
+                    subshareBytes[i] = curBytes[0];
+                }
+                byte[] newShareBytes = SecretSharing.GenerateNewShareBytes(oldShareBytes, subshareBytes);
+                File.WriteAllBytes(updSaveFileDialog.FileName, newShareBytes);
+                MessageBox.Show("New share has been saved. Please delete your old share.", "Operation Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
         /*          Notification methods            */
         private void ProcessNotification(ulong DeliveryTag, IDictionary<string, object> headers, byte[] message)
         {
@@ -730,7 +806,7 @@ namespace ProShare
                                     ntfButton.Click += (o, e) =>
                                     {
                                         ntfActionStackPanel.SelectTab(0); //Action tabpage
-                                        ntfConfLabel1.Text = sender + " wants you to join his secret sharing scheme '" + scheme + "' as a player.";
+                                        ntfConfLabel1.Text = sender + " wants you to join his secret sharing scheme '" + scheme + "' as a participant.";
                                         ntfConfLabel1.Visible = true;
                                         ntfConfLabel2.Text = "Click 'Accept' to accept this request. Otherwise, click 'Reject'.";
                                         ntfConfLabel2.Visible = true;
@@ -812,7 +888,7 @@ namespace ProShare
                                         MQHandler.Ack(DeliveryTag);
 
                                         ntfActionStackPanel.SelectTab(0); //Action tabpage
-                                        ntfConfLabel1.Text = sender + " has " + response + " your request to join scheme '" + scheme + "' as player";
+                                        ntfConfLabel1.Text = sender + " has " + response + " your request to join scheme '" + scheme + "' as participant";
                                         ntfConfLabel1.Visible = true;
                                         if(isAccepted) //kalo udah kehapus gimana???
                                         {
@@ -867,13 +943,13 @@ namespace ProShare
                                     if(isContinued)
                                     {
                                         bText = "[" + scheme + "] " + " Scheme advances to share distribution";
-                                        label1Text = "Good news, all players have accepted the share requests!";
+                                        label1Text = "Good news, all participants have accepted the share requests!";
                                         label2Text = "Now just wait for the dealer (" + sender + ") to distributes the shares.";
                                     }
                                     else
                                     {
                                         bText = "[" + scheme + "] " + " Scheme fails to advance to share distribution";
-                                        label1Text = "Bad news, one or more player(s) have rejected the share request.";
+                                        label1Text = "Bad news, one or more participant(s) have rejected the share request.";
                                         label2Text = "Now the scheme '" + scheme + "'cannot be used and will be deleted.";
                                     }
 
@@ -1056,7 +1132,7 @@ namespace ProShare
 
                                                     //TES
                                                     //byte[] testBytes = SecretSharing.ReconstructByteSecret(byteMatrix, current_k); //tested, pasti berhasil
-                                                    MessageBox.Show("The shares have been sent to all players", "Shares Delivery Completd", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                    MessageBox.Show("The shares have been sent to all participants", "Shares Delivery Completd", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                                     MQHandler.Ack(DeliveryTag);
                                                     DatabaseHandler.Close();
 
@@ -1314,7 +1390,7 @@ namespace ProShare
                                                 string dealer = (string)schemeInfos[2];
                                                 ulong n = (ulong)schemeInfos[4];
                                                 ulong num_of_confirmations = (ulong)schemeInfos[5];
-                                                //Send notifications if all players have been accepted
+                                                //Send notifications if all participants have been accepted
                                                 if (num_of_confirmations == n)
                                                 {
                                                     MQHandler.SendFanoutMessages("Update", "Notice", scheme, dealer, BitConverter.GetBytes(true));
@@ -1352,7 +1428,7 @@ namespace ProShare
                                                 string dealer = (string)schemeInfos[2];
                                                 ulong n = (ulong)schemeInfos[4];
                                                 ulong num_of_confirmations = (ulong)schemeInfos[5];
-                                                //Send notifications if all players have been accepted
+                                                //Send notifications if all particiapnts have accepted
                                                 MQHandler.SendFanoutMessages("Update", "Notice", scheme, "System", BitConverter.GetBytes(false));
                                                 //send ke dealer juga ga?
 
@@ -1428,13 +1504,13 @@ namespace ProShare
                                     if(isAccepted)
                                     {
                                         bText = "[" + scheme + "] " + " Update share operation advances to next step";
-                                        label1Text = "Good news, all players have approved the update share request!";
-                                        label2Text = "Now, please click the button below to generate and send subshares to all players.";
+                                        label1Text = "Good news, all participants have approved the update share request!";
+                                        label2Text = "Now, please click the button below to generate and send subshares to all participants.";
                                     }
                                     else
                                     {
                                         bText = "[" + scheme + "] " + " Update share operation is failed";
-                                        label1Text = "Bad news, a player has rejected the update share request.";
+                                        label1Text = "Bad news, a participant has rejected the update share request.";
                                         label2Text = "Thus, the update operation is failed and will not be processed further.";
                                     }
 
@@ -1456,23 +1532,6 @@ namespace ProShare
                                             RemoveClickEvent(ntfConfButton2);
                                             ntfConfButton2.Click += (o2, e2) =>
                                             {
-                                                /*ntfUpdOpenFileDialog.DefaultExt = "share";
-                                                ntfUpdOpenFileDialog.Filter = "Share document (*.share)|*.share";
-                                                ntfUpdOpenFileDialog.AddExtension = true;
-                                                DialogResult dr = ntfUpdOpenFileDialog.ShowDialog();
-                                                if(dr == DialogResult.OK)
-                                                {
-                                                    //lanjut sini!!
-                                                    string shareFile = ntfUpdOpenFileDialog.FileName;
-                                                    
-                                                    ntfConfLabel2.Text = "Subshares from share file '" + Path.GetFileName(shareFile) + "' have been generated. Click 'Send' to send them to other players.";
-                                                    ntfConfButton2.Enabled = true;
-                                                    ntfConfButton2.Click += (o2, e2) =>
-                                                    {
-                                                        //lanjut kk
-                                                    };
-                                                }*/
-
                                                 try
                                                 {
                                                     DatabaseHandler.Connect();
@@ -1495,7 +1554,10 @@ namespace ProShare
                                                     }
                                                     DatabaseHandler.Close();
 
-                                                    MessageBox.Show("All subshares have been sent to all players", "Delivery Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                    //MessageBox.Show("All subshares have been sent to all participants", "Delivery Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                    ntfConfLabel2.Text = "All subshares have been sent to all participants";
+                                                    ntfConfButton2.Visible = false;
+
                                                     MQHandler.Ack(DeliveryTag);
                                                     ntfPanel.Controls.Remove(ntfButton);
                                                     ntfButton.Dispose();
@@ -1543,6 +1605,12 @@ namespace ProShare
                                             {
                                                 string filename = ntfUpdSaveFileDialog.FileName;
                                                 File.WriteAllBytes(filename, message);
+
+                                                ntfConfLabel2.Text = "Subshare has been saved";
+                                                ntfConfButton2.Visible = false;
+                                                MQHandler.Ack(DeliveryTag);
+                                                ntfPanel.Controls.Remove(ntfButton);
+                                                ntfButton.Dispose();
                                             }
                                         };
                                     };

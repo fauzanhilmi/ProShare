@@ -12,9 +12,12 @@ namespace ProShare
 {
     public static class MQHandler
     {
-        private static string server = "localhost";
-        private static string uid = "guest";
-        private static string pwd = "guest";
+        private static string localServer = "localhost";
+        private static string localUid = "guest";
+        private static string localPwd = "guest";
+        private static string remoteServer = "http://128.199.217.88";
+        private static string remoteUid = "guest";
+        private static string remotePwd = "guest";
 
         //not needed anymore?
         /*private static string generateExchange = "generate";
@@ -29,9 +32,23 @@ namespace ProShare
         public static void Connect()
         {
             ConnectionFactory CF = new ConnectionFactory();
-            CF.HostName = server;
-            CF.UserName = uid;
-            CF.Password = pwd;
+            //GANTI ENVIRONMENT DISINI
+            string env = "local";
+            if(env == "remote")
+            {
+                CF.HostName = remoteServer;
+                CF.UserName = remoteUid;
+                CF.Password = remotePwd;
+            }
+            else if (env == "local")
+            {
+                CF.HostName = localServer;
+                CF.UserName = localUid;
+                CF.Password = localPwd;
+            }
+            //CF.HostName = server;
+            //CF.UserName = uid;
+            //CF.Password = pwd;
 
             conn = CF.CreateConnection();
             model = conn.CreateModel();
