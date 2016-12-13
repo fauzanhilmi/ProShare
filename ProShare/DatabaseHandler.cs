@@ -21,7 +21,7 @@ namespace ProShare
         private static string remoteServer = "128.199.217.88";
         private static string remoteUid = "proshare";
         private static string remotePwd = "proshare";
-        private static string remoteDb = "ProShare";
+        private static string remoteDb = "proshare";
 
         private static string macAddress;
         private static MySql.Data.MySqlClient.MySqlConnection SqlConn;
@@ -60,13 +60,12 @@ namespace ProShare
         {
             string SqlConnString = "";
             //GANTI ENVIRONMENT DISINI
-            string env = "local";
+            string env = "remote";
             if (env == "remote")
             {
                 SqlConnString = "server=" + remoteServer + ";uid=" + remoteUid + ";pwd=" + remotePwd + ";database=" + remoteDb;
-                Debug.WriteLine("Hai");
             }
-            else if(env == "local")
+            else if (env == "local")
             {
                 SqlConnString = "server=" + localServer + ";uid=" + localUid + ";pwd=" + localPwd + ";database=" + localDb;
             }
@@ -370,6 +369,29 @@ namespace ProShare
                 throw;
             }
             return results;
+        }
+
+        public static List<string> GetSchemesByDealer(string dealer)
+        {
+            List<string> schemes = new List<string>();
+            try
+            {
+                string query = "SELECT name FROM scheme WHERE dealer ='" + dealer + "'";
+                Debug.WriteLine(query);
+                MySqlCommand cmd = new MySqlCommand(query, SqlConn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //Debug.WriteLine(reader.GetString(0));
+                    schemes.Add(reader.GetString(0));
+                }
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                Debug.WriteLine(ex.Number + " " + ex.Message);
+                throw;
+            }
+            return schemes;
         }
 
         public static int IncrementConfirmations(string scheme)

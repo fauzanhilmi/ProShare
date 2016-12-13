@@ -31,10 +31,6 @@
             this.panel = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.menuGroupBox = new System.Windows.Forms.GroupBox();
-            this.deleteButton = new System.Windows.Forms.Button();
-            this.cekShareTextBox = new System.Windows.Forms.TextBox();
-            this.cekShareButton = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
             this.notificationsButton = new System.Windows.Forms.Button();
             this.operationsButton = new System.Windows.Forms.Button();
             this.stackPanel = new ProShare.StackPanel();
@@ -182,10 +178,6 @@
             // 
             // menuGroupBox
             // 
-            this.menuGroupBox.Controls.Add(this.deleteButton);
-            this.menuGroupBox.Controls.Add(this.cekShareTextBox);
-            this.menuGroupBox.Controls.Add(this.cekShareButton);
-            this.menuGroupBox.Controls.Add(this.button1);
             this.menuGroupBox.Controls.Add(this.notificationsButton);
             this.menuGroupBox.Controls.Add(this.operationsButton);
             this.menuGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -197,43 +189,6 @@
             this.menuGroupBox.TabIndex = 0;
             this.menuGroupBox.TabStop = false;
             this.menuGroupBox.Text = "Hello, [USERNAME]!";
-            // 
-            // deleteButton
-            // 
-            this.deleteButton.Location = new System.Drawing.Point(35, 430);
-            this.deleteButton.Name = "deleteButton";
-            this.deleteButton.Size = new System.Drawing.Size(135, 33);
-            this.deleteButton.TabIndex = 8;
-            this.deleteButton.Text = "Delete";
-            this.deleteButton.UseVisualStyleBackColor = true;
-            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
-            // 
-            // cekShareTextBox
-            // 
-            this.cekShareTextBox.Location = new System.Drawing.Point(28, 357);
-            this.cekShareTextBox.Name = "cekShareTextBox";
-            this.cekShareTextBox.Size = new System.Drawing.Size(142, 31);
-            this.cekShareTextBox.TabIndex = 4;
-            // 
-            // cekShareButton
-            // 
-            this.cekShareButton.Location = new System.Drawing.Point(62, 394);
-            this.cekShareButton.Name = "cekShareButton";
-            this.cekShareButton.Size = new System.Drawing.Size(108, 30);
-            this.cekShareButton.TabIndex = 3;
-            this.cekShareButton.Text = "Cek Share";
-            this.cekShareButton.UseVisualStyleBackColor = true;
-            this.cekShareButton.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(28, 490);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(87, 26);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // notificationsButton
             // 
@@ -306,7 +261,7 @@
             this.generateTabPage.Padding = new System.Windows.Forms.Padding(3);
             this.generateTabPage.Size = new System.Drawing.Size(523, 475);
             this.generateTabPage.TabIndex = 0;
-            this.generateTabPage.Text = "Share Generation";
+            this.generateTabPage.Text = "Create Scheme";
             this.generateTabPage.UseVisualStyleBackColor = true;
             // 
             // genStatusPanel
@@ -552,7 +507,7 @@
             this.reconstructTabPage.Padding = new System.Windows.Forms.Padding(3);
             this.reconstructTabPage.Size = new System.Drawing.Size(523, 475);
             this.reconstructTabPage.TabIndex = 1;
-            this.reconstructTabPage.Text = "Secret Reconstruction";
+            this.reconstructTabPage.Text = "Reconstruct Secret";
             this.reconstructTabPage.UseVisualStyleBackColor = true;
             // 
             // recGenerateGroupBox
@@ -665,7 +620,7 @@
             this.udpateTabPage.Name = "udpateTabPage";
             this.udpateTabPage.Size = new System.Drawing.Size(523, 475);
             this.udpateTabPage.TabIndex = 2;
-            this.udpateTabPage.Text = "Shares Update";
+            this.udpateTabPage.Text = "Update Shares";
             this.udpateTabPage.UseVisualStyleBackColor = true;
             // 
             // updGenerateGroupBox
@@ -1018,7 +973,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
             this.menuGroupBox.ResumeLayout(false);
-            this.menuGroupBox.PerformLayout();
             this.stackPanel.ResumeLayout(false);
             this.Operations.ResumeLayout(false);
             this.operationsTabControl.ResumeLayout(false);
@@ -1108,7 +1062,6 @@
         private System.Windows.Forms.Label ntfConfLabel1;
         private System.Windows.Forms.Button ntfConfButton2;
         private System.Windows.Forms.Button ntfConfButton1;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button browseGenerateButton;
         private System.Windows.Forms.Label browseChooseLabel;
         private System.Windows.Forms.Label browseOrLabel;
@@ -1117,11 +1070,8 @@
         private System.Windows.Forms.Button browseBrowseButton;
         private System.Windows.Forms.OpenFileDialog browseOpenFileDialog;
         private System.Windows.Forms.SaveFileDialog ntfSaveFileDialog;
-        private System.Windows.Forms.Button cekShareButton;
         private System.Windows.Forms.OpenFileDialog cekOpenFileDialog;
         private System.Windows.Forms.SaveFileDialog cekSaveFileDialog;
-        private System.Windows.Forms.TextBox cekShareTextBox;
-        private System.Windows.Forms.Button deleteButton;
         private System.Windows.Forms.GroupBox recSchemeGroupBox;
         private System.Windows.Forms.Button recSendButton;
         private System.Windows.Forms.GroupBox updSendGroupBox;

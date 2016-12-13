@@ -160,7 +160,11 @@ namespace ProShare
                         try
                         {
                             DatabaseHandler.Connect();
-                            schemes = DatabaseHandler.GetSchemesByPlayer(username);
+                            List<string> schemes1 = DatabaseHandler.GetSchemesByDealer(username);
+                            DatabaseHandler.Close();
+                            DatabaseHandler.Connect();
+                            List<string> schemes2 = DatabaseHandler.GetSchemesByPlayer(username);
+                            schemes = schemes1.Concat(schemes2).ToList();
                             DatabaseHandler.Close();
                         }
                         catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -194,7 +198,11 @@ namespace ProShare
                         try
                         {
                             DatabaseHandler.Connect();
-                            schemes = DatabaseHandler.GetSchemesByPlayer(username);
+                            List<string> schemes1 = DatabaseHandler.GetSchemesByDealer(username);
+                            DatabaseHandler.Close();
+                            DatabaseHandler.Connect();
+                            List<string> schemes2 = DatabaseHandler.GetSchemesByPlayer(username);
+                            schemes = schemes1.Concat(schemes2).ToList();
                             DatabaseHandler.Close();
                         }
                         catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -431,7 +439,11 @@ namespace ProShare
                 int index = genPlayersListBox.FindStringExact(genPlayerTextBox.Text);
                 if(index != -1) //participant is already added
                 {
-                    MessageBox.Show("You have already added this username", "Cannot Add Participant", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("You have already added this username", "Participant Addition Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else if (genPlayerTextBox.Text == username)
+                {
+                    MessageBox.Show("You cannot become a participant", "Participant Addition Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 else
                 {
@@ -1209,6 +1221,9 @@ namespace ProShare
                                         RemoveClickEvent(ntfConfButton1);
                                         ntfConfButton1.Click += (o1, e1) =>
                                         {
+                                            ntfRecOpenFileDialog.DefaultExt = "share";
+                                            ntfRecOpenFileDialog.Filter = "Share document (*.share)|*.share";
+                                            ntfRecOpenFileDialog.AddExtension = true;
                                             DialogResult result = ntfRecOpenFileDialog.ShowDialog();
                                             if (result == DialogResult.OK)
                                             {
@@ -1303,6 +1318,7 @@ namespace ProShare
                                     ntfButton.Text = bText;
                                     ntfButton.Click += (o, e) =>
                                     {
+                                        ntfActionStackPanel.SelectTab(0); //Action
                                         //MQHandler.Ack(DeliveryTag);
                                         ntfConfLabel1.Text = label1Text;
                                         ntfConfLabel1.Visible = true;
@@ -1371,10 +1387,10 @@ namespace ProShare
                                         ntfActionStackPanel.SelectTab(0); //Action
                                         ntfConfLabel1.Text = sender + " has requested shares update on scheme '" + scheme + "'";
                                         ntfConfLabel1.Visible = true;
-                                        ntfConfLabel2.Text = "If you approved this request, click 'Confirm'. Otherwise, click 'Reject'";
+                                        ntfConfLabel2.Text = "If you approved this request, click 'Approve'. Otherwise, click 'Reject'";
                                         ntfConfLabel2.Visible = true;
 
-                                        ntfConfButton1.Text = "Confirm";
+                                        ntfConfButton1.Text = "Approve";
                                         ntfConfButton1.Visible = true;
                                         RemoveClickEvent(ntfConfButton1);
                                         ntfConfButton1.Click += (o1, e1) =>
@@ -1394,7 +1410,7 @@ namespace ProShare
                                                 if (num_of_confirmations == n)
                                                 {
                                                     MQHandler.SendFanoutMessages("Update", "Notice", scheme, dealer, BitConverter.GetBytes(true));
-                                                    //Handle dealer ga???
+                                                    MQHandler.SendDirectMessage("Update", "Dealer", scheme, sender, dealer, BitConverter.GetBytes(true));
                                                     //MQHandler.SendDirectMessage("Update", "Dealer", scheme, "System", dealer, ASCIIEncoding.ASCII.GetBytes("")); //send special request to dealer
                                                 }
 
@@ -1428,9 +1444,9 @@ namespace ProShare
                                                 string dealer = (string)schemeInfos[2];
                                                 ulong n = (ulong)schemeInfos[4];
                                                 ulong num_of_confirmations = (ulong)schemeInfos[5];
-                                                //Send notifications if all particiapnts have accepted
+                                                //Send notifications if all particiapnts have rejected
                                                 MQHandler.SendFanoutMessages("Update", "Notice", scheme, "System", BitConverter.GetBytes(false));
-                                                //send ke dealer juga ga?
+                                                MQHandler.SendDirectMessage("Update", "Dealer", scheme, sender, dealer, BitConverter.GetBytes(false));
 
                                                 ntfConfLabel2.Text = "You rejected this request.";
                                                 ntfConfButton1.Visible = false;
@@ -1445,6 +1461,34 @@ namespace ProShare
                                                 Debug.WriteLine(ex.Message);
                                             };
                                         };
+                                    };
+                                    break;
+                                }
+                            case "Dealer":
+                                {
+                                    bool isAccepted = BitConverter.ToBoolean(message, 0);
+                                    ntfButton.Text = "[" + scheme + "] " + sender + " has " + (isAccepted ? "successfully" : "failedly") + " requested shares update";
+                                    ntfButton.Click += (o, e) =>
+                                    {
+                                        ntfActionStackPanel.SelectTab(0);
+                                        ntfConfLabel1.Text = sender + " has requested shares update requests to all participants";
+                                        ntfConfLabel1.Visible = true;
+
+                                        if (isAccepted)
+                                        {
+                                            ntfConfLabel2.Text = "All participants accepted the requests. They are in the process of updating now.";
+                                        }
+                                        else
+                                        {
+                                            ntfConfLabel2.Text = "Some participant(s) rejected the request(s). Thus, the update operation is failed.";
+                                        }
+                                        ntfConfLabel2.Visible = true;
+                                        ntfConfButton1.Visible = false;
+                                        ntfConfButton2.Visible = false;
+
+                                        MQHandler.Ack(DeliveryTag);
+                                        ntfPanel.Controls.Remove(ntfButton);
+                                        ntfButton.Dispose();
                                     };
                                     break;
                                 }
@@ -1503,13 +1547,13 @@ namespace ProShare
                                     string bText, label1Text, label2Text;
                                     if(isAccepted)
                                     {
-                                        bText = "[" + scheme + "] " + " Update share operation advances to next step";
+                                        bText = "[" + scheme + "] " + "Update share operation advances to next step";
                                         label1Text = "Good news, all participants have approved the update share request!";
-                                        label2Text = "Now, please click the button below to generate and send subshares to all participants.";
+                                        label2Text = "Now, please click the 'Send' button to generate and send subshares to all participants.";
                                     }
                                     else
                                     {
-                                        bText = "[" + scheme + "] " + " Update share operation is failed";
+                                        bText = "[" + scheme + "] " + "Update share operation is failed";
                                         label1Text = "Bad news, a participant has rejected the update share request.";
                                         label2Text = "Thus, the update operation is failed and will not be processed further.";
                                     }
@@ -1526,7 +1570,7 @@ namespace ProShare
                                         if(isAccepted)
                                         {
                                             ntfConfButton1.Visible = false;
-                                            ntfConfButton2.Text = "Send Subshares";
+                                            ntfConfButton2.Text = "Send";
                                             ntfConfButton2.Visible = true;
 
                                             RemoveClickEvent(ntfConfButton2);
@@ -1669,7 +1713,7 @@ namespace ProShare
             //File.WriteAllBytes(filename, current_bytes);
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        /*private void button2_Click(object sender, EventArgs e)
         {
             string scheme = cekShareTextBox.Text;
             cekOpenFileDialog.Multiselect = true;
@@ -1723,7 +1767,7 @@ namespace ProShare
                 }
                 MQHandler.DeleteExchange(scheme);
             }
-        }
+        }*/
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {

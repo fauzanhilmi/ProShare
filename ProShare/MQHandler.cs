@@ -15,9 +15,9 @@ namespace ProShare
         private static string localServer = "localhost";
         private static string localUid = "guest";
         private static string localPwd = "guest";
-        private static string remoteServer = "http://128.199.217.88";
-        private static string remoteUid = "guest";
-        private static string remotePwd = "guest";
+        private static string remoteServer = "128.199.217.88";
+        private static string remoteUid = "fauzan";
+        private static string remotePwd = "fauzan";
 
         //not needed anymore?
         /*private static string generateExchange = "generate";
@@ -33,7 +33,7 @@ namespace ProShare
         {
             ConnectionFactory CF = new ConnectionFactory();
             //GANTI ENVIRONMENT DISINI
-            string env = "local";
+            string env = "remote";
             if(env == "remote")
             {
                 CF.HostName = remoteServer;
