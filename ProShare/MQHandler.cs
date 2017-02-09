@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
 using System.Windows.Forms;
 using System.Diagnostics;
 
@@ -31,27 +32,48 @@ namespace ProShare
 
         public static void Connect()
         {
-            ConnectionFactory CF = new ConnectionFactory();
-            //GANTI ENVIRONMENT DISINI
-            string env = "remote";
-            if(env == "remote")
+            try
             {
-                CF.HostName = remoteServer;
-                CF.UserName = remoteUid;
-                CF.Password = remotePwd;
-            }
-            else if (env == "local")
-            {
-                CF.HostName = localServer;
-                CF.UserName = localUid;
-                CF.Password = localPwd;
-            }
-            //CF.HostName = server;
-            //CF.UserName = uid;
-            //CF.Password = pwd;
+                ConnectionFactory CF = new ConnectionFactory();
 
-            conn = CF.CreateConnection();
-            model = conn.CreateModel();
+                string env = "remote"; //GANTI ENVIRONMENT DISINI
+                if (env == "remote")
+                {
+                    CF.HostName = remoteServer;
+                    CF.UserName = remoteUid;
+                    CF.Password = remotePwd;
+                }
+                else if (env == "local")
+                {
+                    CF.HostName = localServer;
+                    CF.UserName = localUid;
+                    CF.Password = localPwd;
+                }
+                //CF.uri = new Uri("amqps://fauzan:fauzan@128.199.217.88:5671/");
+
+                //TEST SSL
+                //CF.Ssl.ServerName = "localhost";
+                CF.Ssl.Enabled = false;
+                CF.Ssl.ServerName = System.Net.Dns.GetHostName();
+                //CF.Port = 5671;
+                //CF.Ssl.Version = System.Security.Authentication.SslProtocols.Tls12;
+                CF.Ssl.CertPath = "keycert.p12";
+                CF.Ssl.CertPassphrase = "Seiryukan7";
+                //END OF TEST SSL
+
+                conn = CF.CreateConnection();
+                model = conn.CreateModel();
+            }
+            catch (BrokerUnreachableException bex)
+           {
+                Exception ex = bex;
+                while (ex != null)
+                {
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine("inner:");
+                    ex = ex.InnerException;
+                }
+            }
         }
 
         /*                  Generate Methods            */

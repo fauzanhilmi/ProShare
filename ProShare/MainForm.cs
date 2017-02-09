@@ -5,12 +5,12 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Web.Security;
 
 namespace ProShare
 {
@@ -37,7 +37,7 @@ namespace ProShare
 
         /*      RECONSTRUCT attributes      */
         private const string recEmptySchemeText = "You are not involved in any scheme";
-        private const string recEmptyFile = "Select a file";
+        private const string recEmptyFile = "Select files";
         private string[] recShareFiles;
 
         /*      UPDATE attributes           */
@@ -56,10 +56,6 @@ namespace ProShare
         //private byte current_n;
         //private string ntftText = "Notifications (";
 
-
-        /*      TEST attributes                  */
-        //private string current_scheme;
-
         public MainForm()
         {
             InitializeComponent();
@@ -73,6 +69,24 @@ namespace ProShare
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            //TEST
+            /*byte[] clearBytes = Encoding.ASCII.GetBytes("a message to send");
+            byte[] passBytes = Encoding.ASCII.GetBytes("password");
+            byte[] saltBytes = Encoding.ASCII.GetBytes("12345678");
+            byte[] encBytes = AESEncryptBytes(clearBytes, passBytes, saltBytes);
+            byte[] decBytes = AESDecryptBytes(encBytes, passBytes, saltBytes);
+            Debug.WriteLine(Encoding.ASCII.GetString(decBytes));*/
+
+            //BENERAN TEST
+            /*string step1 = "cuma test heh";
+            string tkey = "B9EF9CA48768B2D2D2AD1F4487A7414G";
+
+            Console.WriteLine("step 1 = " + step1);
+            byte[] step2 = AESEncryptBytes(Encoding.ASCII.GetBytes(step1), Encoding.ASCII.GetBytes(tkey));
+            Console.WriteLine("step 2 = " + Encoding.ASCII.GetString(step2));
+            byte[] step3 = AESDecryptBytes(step2, Encoding.ASCII.GetBytes(tkey));
+            Console.WriteLine("step 3 = " + Encoding.ASCII.GetString(step3));*/
+
             /*              MainForm initializations            */
             MQHandler.Connect();
             //TEST
@@ -505,9 +519,17 @@ namespace ProShare
                     int checkRes = DatabaseHandler.DoAccountsExist(players);
                     if(checkRes == 1)
                     {
-                        DatabaseHandler.Close(); 
+                        DatabaseHandler.Close();
                         DatabaseHandler.Connect(); //reopen SQL connection
-                        int addRes = DatabaseHandler.AddScheme(schemeName, username, k, n); //try to add scheme
+
+                        string randPass = Membership.GeneratePassword(10, 10);
+                        string key = HashSHA256(randPass);
+
+                        //TEST ENCRYPTION
+                        //string key = HashMD5(randPass);
+                        //END OF TEST
+                        int addRes = DatabaseHandler.AddScheme(schemeName, username, k, n, key); //try to add scheme
+                        
                         if (addRes == 1) //success
                         {
                             //genStatusLabel.Text = genFirstStatus;
@@ -515,13 +537,6 @@ namespace ProShare
                             genDontCloseLabel.Visible = true;
 
                             DatabaseHandler.AddPlayers(schemeName, players); //add players to db
-                            //TEST
-                            //MQHandler.Connect();
-                            /* foreach(string player in players)
-                            {
-                                //MQHandler.SendShareRequest(schemeName, username, player);
-                            }*/
-                            //MQHandler.Close();
 
                             MQHandler.SendShareRequests(schemeName, username, players);
                             
@@ -610,6 +625,7 @@ namespace ProShare
             }
             else
             {
+                Console.WriteLine(recSharesTextBox.Text);
                 if(recSharesTextBox.Text != recEmptyFile)
                 {
                     DialogResult dr = recSaveFileDialog.ShowDialog();
@@ -621,9 +637,32 @@ namespace ProShare
                             List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
                             byte k = (byte)(ulong)schemeInfos[3];
                             byte n = (byte)(ulong)schemeInfos[4];
-                            SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName);
-                            //File.WriteAllBytes(filename, current_bytes);
-                            MessageBox.Show("Secret reconstruction process is completed", "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            string key = (string)schemeInfos[6];
+                            if(recShareFiles.Length < k)
+                            {
+                                MessageBox.Show("Number of shares are less than number of participants!", "Reconstruction Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                            else
+                            {
+                                //TEST
+                                //SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName);
+                                //TEST ENCRYPTION 
+                                //SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName, Encoding.ASCII.GetBytes(key));
+                                byte[][] sharesBytes = new byte[k][];
+                                for(int i=0; i<sharesBytes.Length; i++)
+                                {
+                                    byte[] encryptedShare = File.ReadAllBytes(recShareFiles[i]);
+                                    File.WriteAllBytes("before "+i + ".txt", encryptedShare);
+                                    sharesBytes[i] = AESDecryptBytes(encryptedShare, Encoding.ASCII.GetBytes(key));
+                                    File.WriteAllBytes("after "+i + ".txt", sharesBytes[i]);
+                                }
+                                byte[] secretBytes = SecretSharing.ReconstructByteSecret(sharesBytes, k);
+                                File.WriteAllBytes(recSaveFileDialog.FileName, secretBytes);
+
+
+                                //File.WriteAllBytes(filename, current_bytes);
+                                MessageBox.Show("Secret reconstruction process is completed", "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
                         }
                         catch (MySql.Data.MySqlClient.MySqlException ex)
                         {
@@ -705,23 +744,56 @@ namespace ProShare
 
         private void updGenerateButton_Click(object sender, EventArgs e)
         {
-            updSaveFileDialog.DefaultExt = "share";
-            updSaveFileDialog.Filter = "Share document (*.share)|*.share";
-            updSaveFileDialog.AddExtension = true;
-            DialogResult dr = updSaveFileDialog.ShowDialog();
-            if (dr == DialogResult.OK)
+            string scheme = updGenerateSchemesComboBox.Text;
+            if (scheme == updEmptySchemeText)
             {
-                //ganti method read byte??
-                byte[] oldShareBytes = File.ReadAllBytes(updShareFile);
-                byte[] subshareBytes = new byte[updSubshareFiles.Length];
-                for (int i = 0; i < updSubshareFiles.Length; i++)
+                //do nothing
+            }
+            else if (updGenerateShareTextBox.Text != updEmptyShare && updGenerateSubsharesTextBox.Text != updEmptySubshare)
+            {
+                updSaveFileDialog.DefaultExt = "share";
+                updSaveFileDialog.Filter = "Share document (*.share)|*.share";
+                updSaveFileDialog.AddExtension = true;
+
+                DialogResult dr = updSaveFileDialog.ShowDialog();
+                if (dr == DialogResult.OK)
                 {
-                    byte[] curBytes = File.ReadAllBytes(updSubshareFiles[i]);
-                    subshareBytes[i] = curBytes[0];
+                    try
+                    {
+                        DatabaseHandler.Connect();
+                        List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
+                        byte k = (byte)(ulong)schemeInfos[3];
+                        byte n = (byte)(ulong)schemeInfos[4];
+                        string key = (string)schemeInfos[6];
+
+                        //ganti method read byte??
+                        byte[] oldShareBytes = File.ReadAllBytes(updShareFile);
+                        byte[] subshareBytes = new byte[updSubshareFiles.Length];
+                        for (int i = 0; i < updSubshareFiles.Length; i++)
+                        {
+                            byte[] curBytes = File.ReadAllBytes(updSubshareFiles[i]);
+                            subshareBytes[i] = curBytes[0];
+
+                            //TEST ENCRYPTION
+                            //byte[] decryptedCurBytes = AESDecryptBytes(curBytes, Encoding.ASCII.GetBytes(key));
+                            //subshareBytes[i] = decryptedCurBytes[0];
+                        }
+
+                        byte[] newShareBytes = SecretSharing.GenerateNewShareBytes(oldShareBytes, subshareBytes);
+                        File.WriteAllBytes(updSaveFileDialog.FileName, newShareBytes);
+
+                        //TEST ENCRYPTION
+                        //byte[] encryptedShareBytes = AESEncryptBytes(newShareBytes, Encoding.ASCII.GetBytes(key));
+                        //File.WriteAllBytes(updSaveFileDialog.FileName, encryptedShareBytes);
+
+                        MessageBox.Show("New share has been saved. Please delete your old share.", "Operation Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        DatabaseHandler.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
-                byte[] newShareBytes = SecretSharing.GenerateNewShareBytes(oldShareBytes, subshareBytes);
-                File.WriteAllBytes(updSaveFileDialog.FileName, newShareBytes);
-                MessageBox.Show("New share has been saved. Please delete your old share.", "Operation Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -734,14 +806,6 @@ namespace ProShare
 
             //IncrementNotifications();
             AddNtfButton(DeliveryTag, contents);
-
-            //TEST
-            /*Debug.WriteLine(">" + DeliveryTag);
-            foreach(var item in contents)
-            {
-                Debug.WriteLine(item.Key + " : " + Encoding.ASCII.GetString((byte[]) item.Value) + " (" + item.Value.ToString() + ")");
-            }
-            Debug.WriteLine("");*/
         }
 
         /*private void IncrementNotifications()
@@ -1077,10 +1141,7 @@ namespace ProShare
                                             byte[] secretBytes = null;
                                             if (browseSecretTextBox.Text != browseEmptyText)
                                             {
-                                                //MessageBox.Show(browseSecretTextBox.Text);
                                                 secretBytes = ASCIIEncoding.ASCII.GetBytes(browseSecretTextBox.Text);
-                                                /*string test = ASCIIEncoding.ASCII.GetString(secretBytes);
-                                                MessageBox.Show(test);*/
                                             }
                                             else if (browseSecretFileTextBox.Text != browseEmptyFile)
                                             {
@@ -1100,12 +1161,6 @@ namespace ProShare
                                                             bytesRead += res;
                                                             bytesLeft -= res;
                                                         }
-
-                                                        //Debug.WriteLine(current_k + " & " + current_n);
-                                                        /*using (FileStream fsWrite = new FileStream("test.png", FileMode.Create, FileAccess.Write))
-                                                        {
-                                                            fsWrite.Write(secretBytes, 0, secretBytes.Length);
-                                                        }*/
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -1126,10 +1181,14 @@ namespace ProShare
                                                     DatabaseHandler.Connect();
                                                     List<object> schemeInfos = DatabaseHandler.GetScheme(scheme);
                                                     byte k = (byte)(ulong)schemeInfos[3];
-                                                    byte n = (byte)(ulong)schemeInfos[4];
+                                                    byte n = (byte)(ulong)schemeInfos[4];   
+                                                    string key = (string)schemeInfos[6];
                                                     DatabaseHandler.Close();
-                                                    //Debug.WriteLine(k + " & " + n);
-                                                    byte[][] byteMatrix = SecretSharing.GenerateByteShares(k, n, secretBytes);
+
+                                                    Console.WriteLine(key);                                                    
+                                                    //byte[][] byteMatrix = SecretSharing.GenerateByteShares(k, n, secretBytes);
+                                                    //TEST ENCRYPTION
+                                                    byte[][] byteMatrix = SecretSharing.GenerateEncryptedByteShares(k, n, secretBytes, Encoding.ASCII.GetBytes(key));
 
                                                     DatabaseHandler.Connect();
                                                     List<string> players = DatabaseHandler.GetPlayers(scheme);
@@ -1142,8 +1201,6 @@ namespace ProShare
                                                         idx++;
                                                     }
 
-                                                    //TES
-                                                    //byte[] testBytes = SecretSharing.ReconstructByteSecret(byteMatrix, current_k); //tested, pasti berhasil
                                                     MessageBox.Show("The shares have been sent to all participants", "Shares Delivery Completd", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                                     MQHandler.Ack(DeliveryTag);
                                                     DatabaseHandler.Close();
@@ -1583,12 +1640,16 @@ namespace ProShare
                                                     DatabaseHandler.Close();
                                                     byte k = (byte)(ulong)schemeInfos[3];
                                                     byte n = (byte)(ulong)schemeInfos[4];
+                                                    string key = (string)schemeInfos[6];
                                                     DatabaseHandler.Connect();
                                                     List<string> players = DatabaseHandler.GetPlayers(scheme);
                                                     players.Sort();
                                                     DatabaseHandler.Close();
 
                                                     byte[] subshares = SecretSharing.GenerateByteSubshares(k, n);
+                                                    //TEST ENCRYPTION
+                                                    //byte[] subshares = SecretSharing.GenerateEncryptedByteSubshares(k, n, Encoding.ASCII.GetBytes(key));
+
                                                     Debug.Assert(players.Count == subshares.Length);
                                                     for(int i=0; i<players.Count; i++)
                                                     {
@@ -1773,5 +1834,142 @@ namespace ProShare
         {
 
         }
+
+        private string HashSHA256(string inputText)
+        {
+            SHA256 sha256 = SHA256Managed.Create();
+            byte[] bytes = Encoding.UTF8.GetBytes(inputText);
+            byte[] hash = sha256.ComputeHash(bytes);
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+            return sb.ToString();
+        }
+
+        private static string HashMD5(string input)
+        {
+            // Use input string to calculate MD5 hash
+            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                // Convert the byte array to hexadecimal string
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("X2"));
+                }
+                return sb.ToString();
+            }
+        }
+
+        private byte[] AESEncryptBytes(byte[] clearBytes, byte[] passBytes)
+        {
+            byte[] saltBytes = Encoding.ASCII.GetBytes("12345678");
+            byte[] encryptedBytes = null;
+
+            // create a key from the password and salt, use 32K iterations – see note
+            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 8192);
+
+            // create an AES object
+            using (Aes aes = new AesManaged())
+            {
+                // set the key size to 256
+                aes.KeySize = 256;
+                aes.Key = key.GetBytes(aes.KeySize / 8);
+                aes.IV = key.GetBytes(aes.BlockSize / 8);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(clearBytes, 0, clearBytes.Length);
+                        cs.Close();
+                    }
+                    encryptedBytes = ms.ToArray();
+                }
+            }
+            return encryptedBytes;
+        }
+
+        private byte[] AESDecryptBytes(byte[] cryptBytes, byte[] passBytes)
+        {
+            byte[] saltBytes = Encoding.ASCII.GetBytes("12345678");
+            byte[] clearBytes = null;
+
+            // create a key from the password and salt, use 32K iterations
+            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 8192);
+
+            using (Aes aes = new AesManaged())
+            {
+                // set the key size to 256
+                aes.KeySize = 256;
+                aes.Key = key.GetBytes(aes.KeySize / 8);
+                aes.IV = key.GetBytes(aes.BlockSize / 8);
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(cryptBytes, 0, cryptBytes.Length);
+                        cs.Close();
+                    }
+                    clearBytes = ms.ToArray();
+                }
+            }
+            return clearBytes;
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        /*private static byte[] AESEncryptBytes(byte[] inputBytes, byte[] key)
+        {
+            string IV = "1234567890123456";
+            AesCryptoServiceProvider dataencrypt = new AesCryptoServiceProvider();
+            //Block size : Gets or sets the block size, in bits, of the cryptographic operation.  
+            dataencrypt.BlockSize = 128;
+            //KeySize: Gets or sets the size, in bits, of the secret key  
+            dataencrypt.KeySize = 128;
+            //Key: Gets or sets the symmetric key that is used for encryption and decryption.  
+            dataencrypt.Key = key;
+            //IV : Gets or sets the initialization vector (IV) for the symmetric algorithm  
+            dataencrypt.IV = System.Text.Encoding.ASCII.GetBytes(IV);
+            //Padding: Gets or sets the padding mode used in the symmetric algorithm  
+            dataencrypt.Padding = PaddingMode.PKCS7;
+            //Mode: Gets or sets the mode for operation of the symmetric algorithm  
+            dataencrypt.Mode = CipherMode.CBC;
+            //Creates a symmetric AES encryptor object using the current key and initialization vector (IV).  
+            ICryptoTransform crypto1 = dataencrypt.CreateEncryptor(dataencrypt.Key, dataencrypt.IV);
+            //TransformFinalBlock is a special function for transforming the last block or a partial block in the stream.   
+            //It returns a new array that contains the remaining transformed bytes. A new array is returned, because the amount of   
+            //information returned at the end might be larger than a single block when padding is added.  
+            byte[] encrypteddata = crypto1.TransformFinalBlock(inputBytes, 0, inputBytes.Length);
+            crypto1.Dispose();
+            //return the encrypted data  
+            return encrypteddata;
+        }
+
+        private static byte[] AESDecryptBytes(byte[] inputBytes, byte[] key)
+        {
+            string IV = "1234567890123456";
+            AesCryptoServiceProvider keydecrypt = new AesCryptoServiceProvider();
+            keydecrypt.BlockSize = 128;
+            keydecrypt.KeySize = 128;
+            keydecrypt.Key = key;
+            keydecrypt.IV = System.Text.Encoding.ASCII.GetBytes(IV);
+            keydecrypt.Padding = PaddingMode.PKCS7;
+            keydecrypt.Mode = CipherMode.CBC;
+            ICryptoTransform crypto1 = keydecrypt.CreateDecryptor(keydecrypt.Key, keydecrypt.IV);
+
+            byte[] returnbytearray = crypto1.TransformFinalBlock(inputBytes, 0, inputBytes.Length);
+            crypto1.Dispose();
+            return returnbytearray;
+        }*/
     }
 }

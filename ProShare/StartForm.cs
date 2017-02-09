@@ -27,7 +27,8 @@ namespace ProShare
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = ColorTranslator.FromHtml("#00B0F0");
 
-            Image logo = Image.FromFile("../../../images/logo.png");
+            //Image logo = Image.FromFile("../../../images/logo.png");
+            Image logo = Properties.Resources.logo;
             logoPictureBox.Image = logo;
 
             waitLabel.Visible = false;
@@ -182,7 +183,7 @@ namespace ProShare
                         }
                         else if(result == 0)
                         {
-                            MessageBox.Show("This computer is already registered. Please login with appropiate account.", "Registration Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBox.Show("Your username is already taken or your computer is already registered. Please login with appropiate account.", "Registration Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
                         //else catch exception
                     }

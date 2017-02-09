@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -79,6 +80,68 @@ namespace ProShare
             }
 
             return byteShares;
+        }
+
+
+        public static byte[][] GenerateEncryptedByteShares(byte k, byte n, byte[] Secret, byte[] key)
+        {
+            if (k == 0 || n == 0)
+            {
+                throw new System.ArgumentException("k and n cannot be 0", "k and n");
+            }
+            if (k > n)
+            {
+                throw new System.ArgumentException("k must be less or equal than n", "k and n");
+            }
+
+            byte[][] byteShares = new byte[n][];
+            for (byte i = 0; i < n; i++)
+            {
+                byteShares[i] = new byte[Secret.Length + 1];
+            }
+            
+            //fill byteShares, array of array of share
+            //byteShares[j][i] = share no. i-1 of player j
+            //byteshares[j][0] is reserved to store the absissca (X value) of player j
+            for (int i = 0; i < Secret.Length; i++)
+            {
+                Share[] CurShares = GenerateShares(k, n, Secret[i]);
+                byte[] curBytes = new byte[Secret.Length + 1];
+
+                for (byte j = 0; j < n; j++)
+                {
+                    if (i == 0)
+                    {
+                        byteShares[j][0] = (byte)CurShares[j].GetX();
+                        //curBytes[0] = (byte)CurShares[j].GetX();
+                    }
+                    byteShares[j][i + 1] = (byte)CurShares[j].GetY();
+                    //TEST LAMA
+                    //curBytes[i + 1] = (byte)CurShares[j].GetY();
+                    //byteShares[j] = AESEncryptBytes(curBytes, key);
+                }
+            }
+
+            //Writing real shares
+            for (int i = 0; i < byteShares.Length; i++)
+            {
+                File.WriteAllBytes(i + "-real.txt", byteShares[i]);
+            }
+
+            //TEST BARU
+            byte[][] encryptedByteMatrix = new byte[n][];
+            for (byte i = 0; i < n; i++)
+            {
+                encryptedByteMatrix[i] = new byte[Secret.Length + 1];
+            }
+
+            for (int i=0; i<n; i++)
+            {
+                encryptedByteMatrix[i] = AESEncryptBytes(byteShares[i], key);
+            }
+            //return byteShares;
+            //TEST
+            return encryptedByteMatrix;
         }
 
         /* Generates n files as shares (their locations are the return value) with reconstruction threshold = k and secret = S 
@@ -233,10 +296,10 @@ namespace ProShare
             {
                 throw new System.ArgumentException("Share file locations cannot be empty and k cannot be 0", "ShareFilesNames and k");
             }
-            /*if (ShareFilesLocations.Length < k)
+            if (ShareFilesLocations.Length < k)
             {
                 throw new System.ArgumentException("The number of Share files cannot be less than k", "ShareFilesNames and k");
-            }*/
+            }
 
             try
             {
@@ -294,8 +357,76 @@ namespace ProShare
             }
         }
 
-        //TODO
-        //public static void UpdateShare()
+        /* Reconstructs secret from first "k" share files from the array of file locations (ShareFilesNames) 
+         * then writes the secret into SecretFileLocation */
+        //TODO : Handle file I/O exceptions
+        //TODO : Filter only .share files?
+        public static void ReconstructFileSecret(string[] ShareFilesLocations, byte k, string SecretFileLocation, byte[] key)
+        {
+            if (ShareFilesLocations.Length == 0 || k == 0)
+            {
+                throw new System.ArgumentException("Share file locations cannot be empty and k cannot be 0", "ShareFilesNames and k");
+            }
+            if (ShareFilesLocations.Length < k)
+            {
+                throw new System.ArgumentException("The number of Share files cannot be less than k", "ShareFilesNames and k");
+            }
+
+            try
+            {
+                Share[][] Shares = new Share[k][];
+
+                //reading file to shares
+                for (int i = 0; i < k; i++)
+                {
+                    using (FileStream fs = new FileStream(ShareFilesLocations[i], FileMode.Open, FileAccess.Read))
+                    {
+                        byte X = (byte)i; //default value
+                        Share[] CurShares = new Share[fs.Length - 1];
+
+                        for (int j = 0; j < fs.Length; j++)
+                        {
+                            //getting the x value in front of the file
+                            if (j == 0)
+                            {
+                                X = (byte)fs.ReadByte();
+                            }
+                            //convert the rest of file to Share
+                            else
+                            {
+                                CurShares[j - 1] = new Share((Field)X, (Field)fs.ReadByte());
+                            }
+                        }
+                        Shares[i] = CurShares;
+                    }
+                }
+
+                //reconstruction process
+                Field[] Secret = new Field[Shares[0].Length];
+                byte[] SecretBytes = new byte[Secret.Length];
+                for (int i = 0; i < Shares[0].Length; i++)
+                {
+                    Share[] CurShares = new Share[k];
+                    for (int j = 0; j < k; j++)
+                    {
+                        CurShares[j] = Shares[j][i];
+                    }
+                    Secret[i] = ReconstructSecret(CurShares, k);
+                    SecretBytes[i] = (byte)Secret[i];
+                }
+                SecretBytes = AESDecryptBytes(SecretBytes, key);
+                //writing secret to file
+                using (FileStream fsWrite = new FileStream(SecretFileLocation, FileMode.Create, FileAccess.Write))
+                {
+                    fsWrite.Write(SecretBytes, 0, SecretBytes.Length);
+                }
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
 
         /* Generates coefficients of a random polynomial with degree = k-1 and a0 = S */
         private static Field[] GeneratePolynomial(byte k, byte S)
@@ -366,6 +497,41 @@ namespace ProShare
             for(int i=0; i<subshareBytes.Length; i++)
             {
                 subshareBytes[i] = (byte)subshare[i];
+            }
+
+            return subshareBytes;
+        }
+
+        public static byte[] GenerateEncryptedByteSubshares(byte k, byte n, byte[] key)
+        {
+            if (k == 0 || n == 0)
+            {
+                throw new System.ArgumentException("k and n cannot be 0", "k and n");
+            }
+            if (k > n)
+            {
+                throw new System.ArgumentException("k must be less or equal than n", "k and n");
+            }
+
+            //Generates array of absissca (x) from 1 to n
+            Field[] XArr = new Field[n];
+            for (byte i = 0; i < n; i++)
+            {
+                XArr[i] = (Field)(i + 1);
+            }
+
+            //Generates byte[] of subshare
+            Field[] subshare = GenerateSubshares(XArr, k);
+            byte[] subshareBytes = new byte[subshare.Length];
+            for (int i = 0; i < subshareBytes.Length; i++)
+            {
+                //subshareBytes[i] = (byte)subshare[i];
+                //TEST ENCRYPT
+                byte curByte = (byte) subshare[i];
+                byte[] curBytes = { curByte };
+                byte[] curEncryptedBytes = AESEncryptBytes(curBytes, key);
+                byte curEncryptedByte = curEncryptedBytes[0];
+                subshareBytes[i] = curEncryptedByte;
             }
 
             return subshareBytes;
@@ -473,7 +639,7 @@ namespace ProShare
 
             //generating new shares
             Field[] subshares = new Field[subshareBytes.Length];
-            for(int i=0; i<subshares.Length; i++)
+            for (int i=0; i<subshares.Length; i++)
             {
                 subshares[i] = (Field)subshareBytes[i];
             }
@@ -499,5 +665,158 @@ namespace ProShare
 
             return newShareBytes;
         }
+
+        //BELUM SELESAI! DONT USE!
+        public static byte[] GenerateNewDecryptedShareBytes(byte[] oldShareBytes, byte[] subshareBytes, byte[] key)
+        {
+            if (subshareBytes.Length == 0 || oldShareBytes.Length == 0)
+            {
+                throw new System.ArgumentException("Array subshares & oldsharebytes cannot be empty", "subshares");
+            }
+
+            Share[] oldShares = new Share[oldShareBytes.Length - 1];
+            byte X = 0;
+            for (int i = 0; i < oldShareBytes.Length; i++)
+            {
+                if (i == 0)
+                {
+                    X = oldShareBytes[i];
+                }
+                else
+                {
+                    oldShares[i - 1] = new Share((Field)X, (Field)oldShareBytes[i]);
+                }
+            }
+
+            //generating new shares
+            Field[] subshares = new Field[subshareBytes.Length];
+            for (int i = 0; i < subshares.Length; i++)
+            {
+                subshares[i] = (Field)subshareBytes[i];
+            }
+
+            Share[] newShares = new Share[oldShares.Length];
+            for (int i = 0; i < newShares.Length; i++)
+            {
+                newShares[i] = GenerateNewShare(oldShares[i], subshares);
+            }
+
+            byte[] newShareBytes = new byte[newShares.Length + 1];
+            for (int i = 0; i < newShareBytes.Length; i++)
+            {
+                if (i == 0)
+                {
+                    newShareBytes[i] = (byte)newShares[0].GetX();
+                }
+                else
+                {
+                    newShareBytes[i] = (byte)newShares[i - 1].GetY();
+                }
+            }
+
+            return newShareBytes;
+        }
+
+       
+        private static byte[] AESEncryptBytes(byte[] clearBytes, byte[] passBytes)
+        {
+            byte[] saltBytes = Encoding.ASCII.GetBytes("12345678");
+            byte[] encryptedBytes = null;
+
+            // create a key from the password and salt, use 32K iterations – see note
+            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 8192);
+
+            // create an AES object
+            using (Aes aes = new AesManaged())
+            {
+                // set the key size to 256
+                aes.KeySize = 256;
+                aes.Key = key.GetBytes(aes.KeySize / 8);
+                aes.IV = key.GetBytes(aes.BlockSize / 8);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(),
+          CryptoStreamMode.Write))
+                    {
+                        cs.Write(clearBytes, 0, clearBytes.Length);
+                        cs.Close();
+                    }
+                    encryptedBytes = ms.ToArray();
+                }
+            }
+            return encryptedBytes;
+        }
+
+        private static byte[] AESDecryptBytes(byte[] cryptBytes, byte[] passBytes)
+        {
+            byte[] saltBytes = Encoding.ASCII.GetBytes("12345678");
+            byte[] clearBytes = null;
+
+            // create a key from the password and salt, use 32K iterations
+            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 8192);
+
+            using (Aes aes = new AesManaged())
+            {
+                // set the key size to 256
+                aes.KeySize = 256;
+                aes.Key = key.GetBytes(aes.KeySize / 8);
+                aes.IV = key.GetBytes(aes.BlockSize / 8);
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(cryptBytes, 0, cryptBytes.Length);
+                        cs.Close();
+                    }
+                    clearBytes = ms.ToArray();
+                }
+            }
+            return clearBytes;
+        }
+
+        /*private static byte[] AESEncryptBytes(byte[] inputBytes, byte[] key)
+        {
+            string IV = "1234567890123456";
+            AesCryptoServiceProvider dataencrypt = new AesCryptoServiceProvider();
+            //Block size : Gets or sets the block size, in bits, of the cryptographic operation.  
+            dataencrypt.BlockSize = 128;
+            //KeySize: Gets or sets the size, in bits, of the secret key  
+            dataencrypt.KeySize = 128;
+            //Key: Gets or sets the symmetric key that is used for encryption and decryption.  
+            dataencrypt.Key = key;
+            //IV : Gets or sets the initialization vector (IV) for the symmetric algorithm  
+            dataencrypt.IV = System.Text.Encoding.ASCII.GetBytes(IV);
+            //Padding: Gets or sets the padding mode used in the symmetric algorithm  
+            dataencrypt.Padding = PaddingMode.PKCS7;
+            //Mode: Gets or sets the mode for operation of the symmetric algorithm  
+            dataencrypt.Mode = CipherMode.CBC;
+            //Creates a symmetric AES encryptor object using the current key and initialization vector (IV).  
+            ICryptoTransform crypto1 = dataencrypt.CreateEncryptor(dataencrypt.Key, dataencrypt.IV);
+            //TransformFinalBlock is a special function for transforming the last block or a partial block in the stream.   
+            //It returns a new array that contains the remaining transformed bytes. A new array is returned, because the amount of   
+            //information returned at the end might be larger than a single block when padding is added.  
+            byte[] encrypteddata = crypto1.TransformFinalBlock(inputBytes, 0, inputBytes.Length);
+            crypto1.Dispose();
+            //return the encrypted data  
+            return encrypteddata;
+        }
+
+        private static byte[] AESDecryptBytes(byte[] inputBytes, byte[] key)
+        {
+            string IV = "1234567890123456";
+            AesCryptoServiceProvider keydecrypt = new AesCryptoServiceProvider();
+            keydecrypt.BlockSize = 128;
+            keydecrypt.KeySize = 128;
+            keydecrypt.Key = key;
+            keydecrypt.IV = System.Text.Encoding.ASCII.GetBytes(IV);
+            keydecrypt.Padding = PaddingMode.PKCS7;
+            keydecrypt.Mode = CipherMode.CBC;
+            ICryptoTransform crypto1 = keydecrypt.CreateDecryptor(keydecrypt.Key, keydecrypt.IV);
+
+            byte[] returnbytearray = crypto1.TransformFinalBlock(inputBytes, 0, inputBytes.Length);
+            crypto1.Dispose();
+            return returnbytearray;
+        }*/
     }
 }

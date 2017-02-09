@@ -76,7 +76,7 @@ namespace ProShare
                 SqlConn = new MySql.Data.MySqlClient.MySqlConnection(SqlConnString);
                 SqlConn.Open();
             }
-            catch (MySql.Data.MySqlClient.MySqlException ex) //is it properly handled?
+            catch (Exception ex) //is it properly handled?
             {
                 Debug.WriteLine(ex.Message);
                 throw;
@@ -280,12 +280,16 @@ namespace ProShare
          * > 1      : Operation is successfully executed 
          * > 0      : Record already exists; Operation is not executed 
          * > else   : Unknown error, return code = SQL error code; Operation is not executed  */
-        public static int AddScheme(string scheme, string dealer, byte k, byte n) /* UNTESTED UNTUK DEALER! */
+        public static int AddScheme(string scheme, string dealer, byte k, byte n, string key) /* UNTESTED UNTUK DEALER! */
+        //TEST
+        //public static int AddScheme(string scheme, string dealer, byte k, byte n) /* UNTESTED UNTUK DEALER! */
         {
             int returnCode = 1;
             try
             {
-                string query = "INSERT INTO scheme (name, dealer, k, n)  VALUES ('" + scheme + "', '"  + dealer+ "', '" + k + "', '" + n + "')";
+                string query = "INSERT INTO scheme (name, dealer, k, n, encryption_key)  VALUES ('" + scheme + "', '"  + dealer + "', '" + k + "', '" + n + "', '" + key +"')";
+                //TEST
+                //string query = "INSERT INTO scheme (name, dealer, k, n)  VALUES ('" + scheme + "', '" + dealer + "', '" + k + "', '" + n + "')";
                 Debug.WriteLine(query);
                 MySqlCommand cmd = new MySqlCommand(query, SqlConn);
                 cmd.ExecuteNonQuery();
@@ -342,6 +346,7 @@ namespace ProShare
          * 3 : k
          * 4 : n
          * 5 : num_of_confirmations
+         * 6 : encryption_key
          * */
         {
             List<object> results = new List<object>();
@@ -361,6 +366,7 @@ namespace ProShare
                     results.Add(reader.GetUInt64(3));
                     results.Add(reader.GetUInt64(4));
                     results.Add(reader.GetUInt64(5));
+                    results.Add(reader.GetString(6));
                 }
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
