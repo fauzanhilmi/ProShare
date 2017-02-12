@@ -645,19 +645,19 @@ namespace ProShare
                             else
                             {
                                 //TEST
-                                SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName);
+                                //SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName);
                                 //TEST ENCRYPTION RECONSTRUCTIOn
                                 //SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName, Encoding.UTF8.GetBytes(key));
-                                /*byte[][] sharesBytes = new byte[k][];
+                                byte[][] sharesBytes = new byte[k][];
                                 for(int i=0; i<sharesBytes.Length; i++)
                                 {
                                     byte[] encryptedShare = File.ReadAllBytes(recShareFiles[i]);
-                                    File.WriteAllBytes("before "+i + ".txt", encryptedShare);
+                                    //File.WriteAllBytes("before "+i + ".txt", encryptedShare);
                                     sharesBytes[i] = AESDecryptBytes(encryptedShare, Encoding.UTF8.GetBytes(key));
-                                    File.WriteAllBytes("after "+i + ".txt", sharesBytes[i]);
+                                    //File.WriteAllBytes("after "+i + ".txt", sharesBytes[i]);
                                 }
                                 byte[] secretBytes = SecretSharing.ReconstructByteSecret(sharesBytes, k);
-                                File.WriteAllBytes(recSaveFileDialog.FileName, secretBytes);*/
+                                File.WriteAllBytes(recSaveFileDialog.FileName, secretBytes);
 
 
                                 //File.WriteAllBytes(filename, current_bytes);
@@ -766,8 +766,10 @@ namespace ProShare
                         byte n = (byte)(ulong)schemeInfos[4];
                         string key = (string)schemeInfos[6];
 
-                        //ganti method read byte??
                         byte[] oldShareBytes = File.ReadAllBytes(updShareFile);
+                        //TEST ENCRYPTION
+                        oldShareBytes = AESDecryptBytes(oldShareBytes, Encoding.UTF8.GetBytes(key));
+
                         byte[] subshareBytes = new byte[updSubshareFiles.Length];
                         for (int i = 0; i < updSubshareFiles.Length; i++)
                         {
@@ -776,15 +778,16 @@ namespace ProShare
 
                             //TEST ENCRYPTION NEW SHARE GENERATION
                             byte[] decryptedCurBytes = AESDecryptBytes(curBytes, Encoding.UTF8.GetBytes(key));
+                            Debug.Assert(decryptedCurBytes.Length == 1);
                             subshareBytes[i] = decryptedCurBytes[0];
                         }
 
                         byte[] newShareBytes = SecretSharing.GenerateNewShareBytes(oldShareBytes, subshareBytes);
-                        File.WriteAllBytes(updSaveFileDialog.FileName, newShareBytes);
+                        //File.WriteAllBytes(updSaveFileDialog.FileName, newShareBytes);
 
                         //TEST ENCRYPTION ENCRYPTED NEW SHARE GENERATION
-                        /*byte[] encryptedShareBytes = AESEncryptBytes(newShareBytes, Encoding.UTF8.GetBytes(key));
-                        File.WriteAllBytes(updSaveFileDialog.FileName, encryptedShareBytes);*/
+                        byte[] encryptedShareBytes = AESEncryptBytes(newShareBytes, Encoding.UTF8.GetBytes(key));
+                        File.WriteAllBytes(updSaveFileDialog.FileName, encryptedShareBytes);
 
                         MessageBox.Show("New share has been saved. Please delete your old share.", "Operation Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         DatabaseHandler.Close();
