@@ -84,6 +84,7 @@ namespace ProShare
 
 
         public static byte[][] GenerateEncryptedByteShares(byte k, byte n, byte[] Secret, byte[] key)
+        //ENCRYPTION
         {
             if (k == 0 || n == 0)
             {
@@ -125,7 +126,7 @@ namespace ProShare
             //Writing real shares
             for (int i = 0; i < byteShares.Length; i++)
             {
-                File.WriteAllBytes(i + "-real.txt", byteShares[i]);
+                File.WriteAllBytes("share"+i+".txt", byteShares[i]);
             }
 
             //TEST BARU
@@ -502,7 +503,8 @@ namespace ProShare
             return subshareBytes;
         }
 
-        public static byte[] GenerateEncryptedByteSubshares(byte k, byte n, byte[] key)
+        public static byte[][] GenerateEncryptedByteSubshares(byte k, byte n, byte[] key)
+        //ENCRYPTION
         {
             if (k == 0 || n == 0)
             {
@@ -525,16 +527,29 @@ namespace ProShare
             byte[] subshareBytes = new byte[subshare.Length];
             for (int i = 0; i < subshareBytes.Length; i++)
             {
-                //subshareBytes[i] = (byte)subshare[i];
+                subshareBytes[i] = (byte)subshare[i];
                 //TEST ENCRYPT
-                byte curByte = (byte) subshare[i];
+                /*byte curByte = (byte) subshare[i];
                 byte[] curBytes = { curByte };
                 byte[] curEncryptedBytes = AESEncryptBytes(curBytes, key);
                 byte curEncryptedByte = curEncryptedBytes[0];
-                subshareBytes[i] = curEncryptedByte;
+                subshareBytes[i] = curEncryptedByte;*/
             }
+            //return subshareBytes;
 
-            return subshareBytes;
+            //Writing real subshares & do encryption
+            File.WriteAllBytes("key.txt", key);
+            byte[][] encryptedSubshares = new byte[subshare.Length][];
+            for (int i=0; i<encryptedSubshares.Length; i++)
+            {
+                byte[] curBytes = { subshareBytes[i] };
+                File.WriteAllBytes("subshare" + i + ".txt", curBytes);
+
+                byte[] curEncryptedBytes = AESEncryptBytes(curBytes, key);
+                encryptedSubshares[i] = curEncryptedBytes;
+                File.WriteAllBytes("subshare encrypted" + i + ".txt", encryptedSubshares[i]);
+            }
+            return encryptedSubshares;
         }
 
         /* Generates new share for a player according to his/her old share (CurShare) and list of subshare (subshares) from other players */
@@ -720,11 +735,11 @@ namespace ProShare
        
         private static byte[] AESEncryptBytes(byte[] clearBytes, byte[] passBytes)
         {
-            byte[] saltBytes = Encoding.ASCII.GetBytes("12345678");
+            byte[] saltBytes = Encoding.UTF8.GetBytes("12345678");
             byte[] encryptedBytes = null;
 
             // create a key from the password and salt, use 32K iterations – see note
-            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 8192);
+            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 256);
 
             // create an AES object
             using (Aes aes = new AesManaged())
@@ -749,11 +764,11 @@ namespace ProShare
 
         private static byte[] AESDecryptBytes(byte[] cryptBytes, byte[] passBytes)
         {
-            byte[] saltBytes = Encoding.ASCII.GetBytes("12345678");
+            byte[] saltBytes = Encoding.UTF8.GetBytes("12345678");
             byte[] clearBytes = null;
 
             // create a key from the password and salt, use 32K iterations
-            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 8192);
+            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 256);
 
             using (Aes aes = new AesManaged())
             {
@@ -786,7 +801,7 @@ namespace ProShare
             //Key: Gets or sets the symmetric key that is used for encryption and decryption.  
             dataencrypt.Key = key;
             //IV : Gets or sets the initialization vector (IV) for the symmetric algorithm  
-            dataencrypt.IV = System.Text.Encoding.ASCII.GetBytes(IV);
+            dataencrypt.IV = System.Text.Encoding.UTF8.GetBytes(IV);
             //Padding: Gets or sets the padding mode used in the symmetric algorithm  
             dataencrypt.Padding = PaddingMode.PKCS7;
             //Mode: Gets or sets the mode for operation of the symmetric algorithm  
@@ -809,7 +824,7 @@ namespace ProShare
             keydecrypt.BlockSize = 128;
             keydecrypt.KeySize = 128;
             keydecrypt.Key = key;
-            keydecrypt.IV = System.Text.Encoding.ASCII.GetBytes(IV);
+            keydecrypt.IV = System.Text.Encoding.UTF8.GetBytes(IV);
             keydecrypt.Padding = PaddingMode.PKCS7;
             keydecrypt.Mode = CipherMode.CBC;
             ICryptoTransform crypto1 = keydecrypt.CreateDecryptor(keydecrypt.Key, keydecrypt.IV);

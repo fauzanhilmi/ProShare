@@ -70,22 +70,27 @@ namespace ProShare
         private void MainForm_Load(object sender, EventArgs e)
         {
             //TEST
-            /*byte[] clearBytes = Encoding.ASCII.GetBytes("a message to send");
-            byte[] passBytes = Encoding.ASCII.GetBytes("password");
-            byte[] saltBytes = Encoding.ASCII.GetBytes("12345678");
-            byte[] encBytes = AESEncryptBytes(clearBytes, passBytes, saltBytes);
-            byte[] decBytes = AESDecryptBytes(encBytes, passBytes, saltBytes);
-            Debug.WriteLine(Encoding.ASCII.GetString(decBytes));*/
+            //byte[] clearBytes = Encoding.UTF8.GetBytes("­­­Ê");
+            byte[] clearBytes = File.ReadAllBytes("subshare encrypted0.txt");
+            Debug.WriteLine(clearBytes[0]);
+            byte[] passBytes = Encoding.UTF8.GetBytes("6A6357C4506FD8EF0C98F29403388854828B1CE889F037894DBD5F37C5E57C51");
+            /*byte[] encBytes = AESEncryptBytes(clearBytes, passBytes);
+            Debug.WriteLine("enc = " + Encoding.UTF8.GetString(encBytes));
+            File.WriteAllBytes("enc.txt", encBytes);*/
+            byte[] decBytes = AESDecryptBytes(clearBytes, passBytes);
+            Debug.WriteLine("dec = "+Encoding.UTF8.GetString(decBytes));
+            File.WriteAllBytes("dec.txt", decBytes);
+
 
             //BENERAN TEST
             /*string step1 = "cuma test heh";
             string tkey = "B9EF9CA48768B2D2D2AD1F4487A7414G";
 
             Console.WriteLine("step 1 = " + step1);
-            byte[] step2 = AESEncryptBytes(Encoding.ASCII.GetBytes(step1), Encoding.ASCII.GetBytes(tkey));
-            Console.WriteLine("step 2 = " + Encoding.ASCII.GetString(step2));
-            byte[] step3 = AESDecryptBytes(step2, Encoding.ASCII.GetBytes(tkey));
-            Console.WriteLine("step 3 = " + Encoding.ASCII.GetString(step3));*/
+            byte[] step2 = AESEncryptBytes(Encoding.UTF8.GetBytes(step1), Encoding.UTF8.GetBytes(tkey));
+            Console.WriteLine("step 2 = " + Encoding.UTF8.GetString(step2));
+            byte[] step3 = AESDecryptBytes(step2, Encoding.UTF8.GetBytes(tkey));
+            Console.WriteLine("step 3 = " + Encoding.UTF8.GetString(step3));*/
 
             /*              MainForm initializations            */
             MQHandler.Connect();
@@ -585,7 +590,7 @@ namespace ProShare
                     DatabaseHandler.ResetConfirmations(scheme);
                     DatabaseHandler.Close();
 
-                    MQHandler.SendFanoutMessages("Reconstruct", "Request", scheme, username, ASCIIEncoding.ASCII.GetBytes(""));
+                    MQHandler.SendFanoutMessages("Reconstruct", "Request", scheme, username, UTF8Encoding.UTF8.GetBytes(""));
                     MessageBox.Show("Reconstruction requests delivery is completed", "Delivery Succeed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -645,19 +650,19 @@ namespace ProShare
                             else
                             {
                                 //TEST
-                                //SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName);
-                                //TEST ENCRYPTION 
-                                //SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName, Encoding.ASCII.GetBytes(key));
-                                byte[][] sharesBytes = new byte[k][];
+                                SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName);
+                                //TEST ENCRYPTION SHARE RECONSTRUCTION 
+                                //SecretSharing.ReconstructFileSecret(recShareFiles, k, recSaveFileDialog.FileName, Encoding.UTF8.GetBytes(key));
+                                /*byte[][] sharesBytes = new byte[k][];
                                 for(int i=0; i<sharesBytes.Length; i++)
                                 {
                                     byte[] encryptedShare = File.ReadAllBytes(recShareFiles[i]);
-                                    File.WriteAllBytes("before "+i + ".txt", encryptedShare);
-                                    sharesBytes[i] = AESDecryptBytes(encryptedShare, Encoding.ASCII.GetBytes(key));
-                                    File.WriteAllBytes("after "+i + ".txt", sharesBytes[i]);
-                                }
+                                    //File.WriteAllBytes("before "+i + ".txt", encryptedShare);
+                                    sharesBytes[i] = AESDecryptBytes(encryptedShare, Encoding.UTF8.GetBytes(key));
+                                    //File.WriteAllBytes("after "+i + ".txt", sharesBytes[i]);
+                                }*
                                 byte[] secretBytes = SecretSharing.ReconstructByteSecret(sharesBytes, k);
-                                File.WriteAllBytes(recSaveFileDialog.FileName, secretBytes);
+                                File.WriteAllBytes(recSaveFileDialog.FileName, secretBytes);*/
 
 
                                 //File.WriteAllBytes(filename, current_bytes);
@@ -689,7 +694,7 @@ namespace ProShare
                     DatabaseHandler.ResetConfirmations(scheme);
                     DatabaseHandler.Close();
 
-                    MQHandler.SendFanoutMessages("Update", "Request", scheme, username, ASCIIEncoding.ASCII.GetBytes(""));
+                    MQHandler.SendFanoutMessages("Update", "Request", scheme, username, UTF8Encoding.UTF8.GetBytes(""));
                     MessageBox.Show("Update requests delivery is completed", "Delivery Succeed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -772,19 +777,24 @@ namespace ProShare
                         for (int i = 0; i < updSubshareFiles.Length; i++)
                         {
                             byte[] curBytes = File.ReadAllBytes(updSubshareFiles[i]);
+                            /*File.WriteAllBytes("UPDATE susbhare no " + i + ".subshare", curBytes);*/
                             subshareBytes[i] = curBytes[0];
 
-                            //TEST ENCRYPTION
-                            //byte[] decryptedCurBytes = AESDecryptBytes(curBytes, Encoding.ASCII.GetBytes(key));
-                            //subshareBytes[i] = decryptedCurBytes[0];
+                            //TEST ENCRYPTION SHArE UPDATE
+                            /*byte[] decryptedCurBytes = AESDecryptBytes(curBytes, Encoding.UTF8.GetBytes(key));
+                            File.WriteAllBytes("UPDATE decrypted no "+i+".subshare", decryptedCurBytes);
+                            Debug.Assert(decryptedCurBytes.Length == 1);
+                            subshareBytes[i] = decryptedCurBytes[0];*/
                         }
 
                         byte[] newShareBytes = SecretSharing.GenerateNewShareBytes(oldShareBytes, subshareBytes);
+                        File.WriteAllBytes("UPDATE real share budi.share", newShareBytes);
+
                         File.WriteAllBytes(updSaveFileDialog.FileName, newShareBytes);
 
-                        //TEST ENCRYPTION
-                        //byte[] encryptedShareBytes = AESEncryptBytes(newShareBytes, Encoding.ASCII.GetBytes(key));
-                        //File.WriteAllBytes(updSaveFileDialog.FileName, encryptedShareBytes);
+                        //TEST ENCRYPTIOON
+                        /*byte[] encryptedShareBytes = AESEncryptBytes(newShareBytes, Encoding.UTF8.GetBytes(key));
+                        File.WriteAllBytes(updSaveFileDialog.FileName, encryptedShareBytes);*/
 
                         MessageBox.Show("New share has been saved. Please delete your old share.", "Operation Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         DatabaseHandler.Close();
@@ -861,11 +871,11 @@ namespace ProShare
             ntfButton.TextAlign = ContentAlignment.TopLeft;
 
             //setting the button text
-            string operation = Encoding.ASCII.GetString((byte[])contents["Operation"]);
-            string type = Encoding.ASCII.GetString((byte[])contents["Type"]);
-            string scheme = Encoding.ASCII.GetString((byte[])contents["Scheme"]);
+            string operation = Encoding.UTF8.GetString((byte[])contents["Operation"]);
+            string type = Encoding.UTF8.GetString((byte[])contents["Type"]);
+            string scheme = Encoding.UTF8.GetString((byte[])contents["Scheme"]);
             //current_scheme = scheme;
-            string sender = Encoding.ASCII.GetString((byte[])contents["Sender"]);
+            string sender = Encoding.UTF8.GetString((byte[])contents["Sender"]);
             byte[] message = (byte[])contents["Message"];
 
             //Debug.WriteLine(username + " received (" + operation + ", " + type + ", " + scheme + ", " + sender + ", " +message+")");
@@ -908,7 +918,7 @@ namespace ProShare
                                                 if (num_of_confirmations == n)
                                                 {
                                                     MQHandler.SendFanoutMessages("Generate", "Notice", scheme, dealer, BitConverter.GetBytes(true));
-                                                    MQHandler.SendDirectMessage("Generate", "Dealer", scheme, "System", dealer, ASCIIEncoding.ASCII.GetBytes("")); //send special request to dealer
+                                                    MQHandler.SendDirectMessage("Generate", "Dealer", scheme, "System", dealer, UTF8Encoding.UTF8.GetBytes("")); //send special request to dealer
                                                 }
 
                                                 ntfConfLabel2.Text = "You accepted this request.";
@@ -1141,7 +1151,9 @@ namespace ProShare
                                             byte[] secretBytes = null;
                                             if (browseSecretTextBox.Text != browseEmptyText)
                                             {
-                                                secretBytes = ASCIIEncoding.ASCII.GetBytes(browseSecretTextBox.Text);
+                                                //secretBytes = UTF8Encoding.UTF8.GetBytes(browseSecretTextBox.Text);
+                                                //TEST
+                                                secretBytes = Encoding.UTF8.GetBytes(browseSecretTextBox.Text);
                                             }
                                             else if (browseSecretFileTextBox.Text != browseEmptyFile)
                                             {
@@ -1186,9 +1198,9 @@ namespace ProShare
                                                     DatabaseHandler.Close();
 
                                                     Console.WriteLine(key);                                                    
-                                                    //byte[][] byteMatrix = SecretSharing.GenerateByteShares(k, n, secretBytes);
-                                                    //TEST ENCRYPTION
-                                                    byte[][] byteMatrix = SecretSharing.GenerateEncryptedByteShares(k, n, secretBytes, Encoding.ASCII.GetBytes(key));
+                                                    byte[][] byteMatrix = SecretSharing.GenerateByteShares(k, n, secretBytes);
+                                                    //TEST ENCRYPTION SHARE GENERATION
+                                                    //byte[][] byteMatrix = SecretSharing.GenerateEncryptedByteShares(k, n, secretBytes, Encoding.UTF8.GetBytes(key));
 
                                                     DatabaseHandler.Connect();
                                                     List<string> players = DatabaseHandler.GetPlayers(scheme);
@@ -1310,7 +1322,7 @@ namespace ProShare
                                                                 bytesLeft -= res;
                                                             }
                                                         }
-                                                        //byte[] shareBytes = ASCIIEncoding.ASCII.GetBytes(shareFile);
+                                                        //byte[] shareBytes = UTF8Encoding.UTF8.GetBytes(shareFile);
                                                         MQHandler.SendDirectMessage("Reconstruct", "Response", scheme, username, sender, shareBytes);
 
                                                         ntfConfLabel2.Text = "You have sent your share to " + sender + ".";
@@ -1468,7 +1480,7 @@ namespace ProShare
                                                 {
                                                     MQHandler.SendFanoutMessages("Update", "Notice", scheme, dealer, BitConverter.GetBytes(true));
                                                     MQHandler.SendDirectMessage("Update", "Dealer", scheme, sender, dealer, BitConverter.GetBytes(true));
-                                                    //MQHandler.SendDirectMessage("Update", "Dealer", scheme, "System", dealer, ASCIIEncoding.ASCII.GetBytes("")); //send special request to dealer
+                                                    //MQHandler.SendDirectMessage("Update", "Dealer", scheme, "System", dealer, UTF8Encoding.UTF8.GetBytes("")); //send special request to dealer
                                                 }
 
                                                 ntfConfLabel2.Text = "You approved this request.";
@@ -1647,8 +1659,10 @@ namespace ProShare
                                                     DatabaseHandler.Close();
 
                                                     byte[] subshares = SecretSharing.GenerateByteSubshares(k, n);
-                                                    //TEST ENCRYPTION
-                                                    //byte[] subshares = SecretSharing.GenerateEncryptedByteSubshares(k, n, Encoding.ASCII.GetBytes(key));
+                                                    //ENCRYPTION SUBSHARE GENERATION
+                                                    //byte[] subshares = SecretSharing.GenerateEncryptedByteSubshares(k, n, Encoding.UTF8.GetBytes(key));
+                                                    //TEST ENCRYPTIOON V2
+                                                    //byte[][] subshares = SecretSharing.GenerateEncryptedByteSubshares(k, n, Encoding.UTF8.GetBytes(key));
 
                                                     Debug.Assert(players.Count == subshares.Length);
                                                     for(int i=0; i<players.Count; i++)
@@ -1657,10 +1671,18 @@ namespace ProShare
                                                         curByte[0] = subshares[i];
                                                         MQHandler.SendDirectMessage("Update", "Subshare", scheme, username, players[i], curByte);
                                                     }
-                                                    DatabaseHandler.Close();
 
-                                                    //MessageBox.Show("All subshares have been sent to all participants", "Delivery Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                                    ntfConfLabel2.Text = "All subshares have been sent to all participants";
+                                                    //TEST ENCRYPTIOON V2
+                                                    /*for (int i=0; i<players.Count; i++)
+                                                    {
+                                                        byte[] curBytes = subshares[i];
+                                                        File.WriteAllBytes("subshare on send" + i + ".txt", curBytes);
+                                                        MQHandler.SendDirectMessage("Update", "Subshare", scheme, username, players[i], curBytes);
+                                                    }*/
+
+                                                    DatabaseHandler.Close();
+                                                     //MessageBox.Show("All subshares have been sent to all participants", "Delivery Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                     ntfConfLabel2.Text = "All subshares have been sent to all participants";
                                                     ntfConfButton2.Visible = false;
 
                                                     MQHandler.Ack(DeliveryTag);
@@ -1854,7 +1876,7 @@ namespace ProShare
             // Use input string to calculate MD5 hash
             using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
             {
-                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
                 byte[] hashBytes = md5.ComputeHash(inputBytes);
 
                 // Convert the byte array to hexadecimal string
@@ -1869,11 +1891,11 @@ namespace ProShare
 
         private byte[] AESEncryptBytes(byte[] clearBytes, byte[] passBytes)
         {
-            byte[] saltBytes = Encoding.ASCII.GetBytes("12345678");
+            byte[] saltBytes = Encoding.UTF8.GetBytes("12345678");
             byte[] encryptedBytes = null;
 
             // create a key from the password and salt, use 32K iterations – see note
-            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 8192);
+            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 256);
 
             // create an AES object
             using (Aes aes = new AesManaged())
@@ -1897,11 +1919,11 @@ namespace ProShare
 
         private byte[] AESDecryptBytes(byte[] cryptBytes, byte[] passBytes)
         {
-            byte[] saltBytes = Encoding.ASCII.GetBytes("12345678");
+            byte[] saltBytes = Encoding.UTF8.GetBytes("12345678");
             byte[] clearBytes = null;
 
             // create a key from the password and salt, use 32K iterations
-            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 8192);
+            var key = new Rfc2898DeriveBytes(passBytes, saltBytes, 256);
 
             using (Aes aes = new AesManaged())
             {
@@ -1939,7 +1961,7 @@ namespace ProShare
             //Key: Gets or sets the symmetric key that is used for encryption and decryption.  
             dataencrypt.Key = key;
             //IV : Gets or sets the initialization vector (IV) for the symmetric algorithm  
-            dataencrypt.IV = System.Text.Encoding.ASCII.GetBytes(IV);
+            dataencrypt.IV = System.Text.Encoding.UTF8.GetBytes(IV);
             //Padding: Gets or sets the padding mode used in the symmetric algorithm  
             dataencrypt.Padding = PaddingMode.PKCS7;
             //Mode: Gets or sets the mode for operation of the symmetric algorithm  
@@ -1962,7 +1984,7 @@ namespace ProShare
             keydecrypt.BlockSize = 128;
             keydecrypt.KeySize = 128;
             keydecrypt.Key = key;
-            keydecrypt.IV = System.Text.Encoding.ASCII.GetBytes(IV);
+            keydecrypt.IV = System.Text.Encoding.UTF8.GetBytes(IV);
             keydecrypt.Padding = PaddingMode.PKCS7;
             keydecrypt.Mode = CipherMode.CBC;
             ICryptoTransform crypto1 = keydecrypt.CreateDecryptor(keydecrypt.Key, keydecrypt.IV);
